@@ -32,11 +32,13 @@ public class Poker {
         Collections.shuffle(cards); // Shuffle the deck randomly
     }
 
+    //发一张牌
     public Card DealCard()
     {
         CardIndex++;
         return cards.get(CardIndex-1);
     }
+
 
 
 
