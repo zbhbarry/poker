@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class player {
 
 
@@ -10,6 +13,8 @@ public class player {
     private int Position;
 
     private String name;
+
+    private List<Card> Hands;
 
     public int getChips() {
         return chips;
@@ -43,8 +48,24 @@ public class player {
         this.name = name;
     }
 
-    public player(String name) {
-       this.name=name;
+    public List<Card> getHands() {
+        return Hands;
     }
 
+    public void setHands(List<Card> hands) {
+        Hands = hands;
+    }
+
+    public player(String name) {
+       this.name=name;
+       this.chips=0;
+       this.Hands=new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return name+"的手牌是"+getHands().get(0).toString()+","
+        +getHands().get(1).toString()
+        + ","+"有"+chips+"筹码,";
+    }
 }

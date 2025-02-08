@@ -9,6 +9,8 @@ public class Poker {
 
     private final List<Card> cards;//All PokerDeck
 
+    private int CardIndex=0;
+
 
     public Poker()
     {
@@ -30,6 +32,11 @@ public class Poker {
         Collections.shuffle(cards); // Shuffle the deck randomly
     }
 
+    public Card DealCard()
+    {
+        CardIndex++;
+        return cards.get(CardIndex-1);
+    }
 
 
 
