@@ -5,37 +5,66 @@ import java.util.List;
 
 public class Desk {
 
-
     private final Poker poker;
 
-    private List<player> players;
+    private final List<Player> players;
 
-    public Desk()
-    {
+    private final Comparator comparator;
+
+    public Desk() {
         this.poker=new Poker();
+        this.comparator=new Comparator();
         this.players=new ArrayList<>();
         for (int i = 0; i < 6; i++) {
-            players.add(new player("player"+i));
+            players.add(new Player("player"+i));
         }
         DealHands();
+
+
+        DealFlop();
+
+
+
+        DealTurn();
+
+
+
+        DealRiver();
+
     }
 
     public Poker getPoker() {
         return poker;
     }
 
-    public List<player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
-    public void DealHands()
-    {
+    public void DealHands() {
         int i=0;
         while (i<2) {
-            for (player player : players) {
+            for (Player player : players) {
                 player.getHands().add(poker.DealCard());
             }
             i++;
         }
+    }
+
+    public void DealFlop() {
+        poker.DealCard();
+        for (int i = 0; i < 3; i++) {
+            comparator.getCommunityCard().add(poker.DealCard());
+        }
+    }
+
+    public void DealTurn() {
+        poker.DealCard();
+        comparator.getCommunityCard().add(poker.DealCard());
+    }
+
+    public void DealRiver() {
+        poker.DealCard();
+        comparator.getCommunityCard().add(poker.DealCard());
     }
 }

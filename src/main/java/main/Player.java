@@ -3,7 +3,8 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-public class player {
+public class Player {
+
 
 
     private int chips;
@@ -15,6 +16,26 @@ public class player {
     private String name;
 
     private List<Card> Hands;
+
+    private List<Card> MaxShapeCards;
+
+    private Comparator.Shape shape;
+
+    public List<Card> getMaxShapeCards() {
+        return MaxShapeCards;
+    }
+
+    public void setMaxShapeCards(List<Card> maxShapeCards) {
+        MaxShapeCards = maxShapeCards;
+    }
+
+    public Comparator.Shape getShape() {
+        return shape;
+    }
+
+    public void setShape(Comparator.Shape shape) {
+        this.shape = shape;
+    }
 
     public int getChips() {
         return chips;
@@ -56,7 +77,7 @@ public class player {
         Hands = hands;
     }
 
-    public player(String name) {
+    public Player(String name) {
        this.name=name;
        this.chips=0;
        this.Hands=new ArrayList<>();
