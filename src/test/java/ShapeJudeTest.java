@@ -12,6 +12,7 @@ public class ShapeJudeTest {
     Player player=new Player("li");
 
     public static void main(String[] args) {
+
         ShapeJudeTest shapeJudeTest =new ShapeJudeTest();
         shapeJudeTest.HighCardTest();
         sep();
@@ -24,6 +25,12 @@ public class ShapeJudeTest {
         shapeJudeTest.StraightTest();
         sep();
         shapeJudeTest.FlushTest();
+        sep();
+        shapeJudeTest.FullHouseTest();
+        sep();
+        shapeJudeTest.FourKindTest();
+        sep();
+        shapeJudeTest.StraightFlushTest();
 
     }
 
@@ -51,8 +58,8 @@ public class ShapeJudeTest {
         CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.JACK));
 
 
-        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.KING));
-        player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.QUEEN));
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.KING));
+        player.getHands().add(new Card(Card.Suit.CLUBS, Card.Rank.QUEEN));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();
@@ -74,8 +81,8 @@ public class ShapeJudeTest {
         CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.JACK));
 
 
-        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.KING));
-        player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.QUEEN));
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.KING));
+        player.getHands().add(new Card(Card.Suit.CLUBS, Card.Rank.QUEEN));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();
@@ -96,8 +103,8 @@ public class ShapeJudeTest {
         CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.JACK));
 
 
-        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.EIGHT));
-        player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.FOUR));
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.EIGHT));
+        player.getHands().add(new Card(Card.Suit.CLUBS, Card.Rank.FOUR));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();
@@ -118,8 +125,8 @@ public class ShapeJudeTest {
         CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.EIGHT));
 
 
-        player.getHands().add(0,new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
-        player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.FIVE));
+        player.getHands().add(new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
+        player.getHands().add(new Card(Card.Suit.CLUBS, Card.Rank.FIVE));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();
@@ -141,8 +148,8 @@ public class ShapeJudeTest {
         CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
 
 
-        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
-        player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.FOUR));
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
+        player.getHands().add(new Card(Card.Suit.CLUBS, Card.Rank.FOUR));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();
@@ -164,8 +171,74 @@ public class ShapeJudeTest {
         CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
 
 
-        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
-        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FOUR));
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.FOUR));
+
+        shapeJude.SetInfo(player,CommunityCard);
+        shapeJude.CardJude();
+
+        System.out.println(shapeJude.getAllCard());
+        System.out.println(player.getMaxShapeCards());
+        System.out.println(player.getShape());
+    }
+
+    public void FullHouseTest()
+    {
+
+        Clear();
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.SPADES, Card.Rank.FIVE));
+        CommunityCard.add(new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.CLUBS, Card.Rank.FIVE));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
+
+
+        player.getHands().add(new Card(Card.Suit.SPADES, Card.Rank.NINE));
+        player.getHands().add(new Card(Card.Suit.DIAMONDS, Card.Rank.FIVE));
+
+        shapeJude.SetInfo(player,CommunityCard);
+        shapeJude.CardJude();
+
+        System.out.println(shapeJude.getAllCard());
+        System.out.println(player.getMaxShapeCards());
+        System.out.println(player.getShape());
+    }
+
+    public void FourKindTest()
+    {
+
+        Clear();
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.SPADES, Card.Rank.KING));
+        CommunityCard.add(new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.CLUBS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
+
+
+        player.getHands().add(new Card(Card.Suit.SPADES, Card.Rank.ACE));
+        player.getHands().add(new Card(Card.Suit.DIAMONDS, Card.Rank.FIVE));
+
+        shapeJude.SetInfo(player,CommunityCard);
+        shapeJude.CardJude();
+
+        System.out.println(shapeJude.getAllCard());
+        System.out.println(player.getMaxShapeCards());
+        System.out.println(player.getShape());
+    }
+
+    public void StraightFlushTest()
+    {
+
+        Clear();
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.FOUR));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TEN));
+
+
+        player.getHands().add(new Card(Card.Suit.HEARTS, Card.Rank.THREE));
+        player.getHands().add(new Card(Card.Suit.DIAMONDS, Card.Rank.FIVE));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();

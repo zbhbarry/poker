@@ -86,7 +86,6 @@ public class Player {
 
     public void InitPlayer()
     {
-
         getHands().clear();
         setShape(null);
         getMaxShapeCards().clear();

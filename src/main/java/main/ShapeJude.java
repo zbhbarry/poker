@@ -118,9 +118,9 @@ public class ShapeJude {
             player.setShape(Shape.FOUR_OF_A_KIND);
         } else if (isFullHouse()) {
             player.setShape(Shape.FULL_HOUSE);
-        } else if (isFlush()) {
+        } else if (isFlush(true,null)) {
             player.setShape(Shape.FLUSH);
-        } else if (isStraight(AllCard, true)) {
+        } else if (isStraight(AllCard)) {
             player.setShape(Shape.STRAIGHT);
         } else if (isThreeOfKind()) {
             player.setShape(Shape.THREE_OF_A_KIND);
@@ -238,6 +238,7 @@ public class ShapeJude {
         List<Integer> ThreeKind = new ArrayList<>();
         int Index = 0;
 
+        //判断是否有值超过三次
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             int key = entry.getKey();
             int value = entry.getValue();
@@ -248,12 +249,14 @@ public class ShapeJude {
             }
         }
 
+        //如果没有的话返回false，并将三条的值放入
         if (ThreeKind.size() == 1) {
             Max.add(ThreeKind.get(0));
         } else {
             return false;
         }
 
+        //将剩余三条外的值补齐
         while (Max.size() < 3) {
             int rank = AllCard.get(Index).rank.getValue();
             if (rank != ThreeKind.get(0)) {
@@ -265,8 +268,7 @@ public class ShapeJude {
 
     }
 
-
-    private boolean isStraight(List<Card> AllCard, boolean store) {
+    private boolean isStraight(List<Card> AllCard) {
 
         Max.clear();
         int MinNum = 0;
@@ -326,46 +328,63 @@ public class ShapeJude {
             return false;
         } else {
 
-            if (store) {
-                for (int i = MinNum + 4; i >= MinNum; i--) {
-                    Max.add(i);
-                }
+            for (int i = MinNum + 4; i >= MinNum; i--) {
+                Max.add(i);
             }
             return true;
         }
 
     }
 
-    private boolean isFlush ()
+    private boolean isFlush (boolean store,List<Card> StoreAll)
     {
 
          Max.clear();
          Map<Card.Suit,List<Integer>> SuitMap=new HashMap<>();
+         Map<Card.Suit,List<Card>> SuitCard=new HashMap<>();
 
-         //将同花色的卡牌写入对应的集合
+         //将同花色的卡牌的值写入对应的集合,并且将不同花色的卡牌写入集合
          for (Card card : AllCard) {
              Card.Suit suit=card.suit;
              int rank=card.rank.getValue();
              if(!SuitMap.containsKey(suit)) {
                  List<Integer> ranks=new ArrayList<>();
+                 List<Card> cards=new ArrayList<>();
                  ranks.add(rank);
+                 cards.add(card);
                  SuitMap.put(suit,ranks);
+                 SuitCard.put(suit,cards);
              }else {
                  SuitMap.get(suit).add(rank);
+                 SuitCard.get(suit).add(card);
              }
          }
 
 
-         //判断是否有花色的数量超过4张
-         for (Map.Entry<Card.Suit, List<Integer>> entry : SuitMap.entrySet()) {
-            Card.Suit suit=entry.getKey();
-            List<Integer> ranks=entry.getValue();
-            if(ranks.size()>=5) {
-                ranks.sort((o1, o2) -> o2-o1);
-                Max.addAll(ranks.subList(0,5));
-                return true;
-            }
+         //判断是否存储，如果存储就返回，如果不存储就为同花顺的后续判断做准备
+         if(store) {
+             //判断是否有花色的数量超过4张
+             for (Map.Entry<Card.Suit, List<Integer>> entry : SuitMap.entrySet()) {
+
+                 List<Integer> ranks=entry.getValue();
+                 if(ranks.size()>=5) {
+                     ranks.sort((o1, o2) -> o2-o1);
+                     Max.addAll(ranks.subList(0,5));
+                     return true;
+                 }
+             }
+         }else {
+             for (Map.Entry<Card.Suit, List<Card>> entry : SuitCard.entrySet()) {
+
+                 List<Card> cards=entry.getValue();
+                 if(cards.size()>=5) {
+                     Collections.sort(cards);
+                     StoreAll.addAll(cards);
+                     return true;
+                 }
+             }
          }
+
 
          return false;
 
@@ -373,18 +392,88 @@ public class ShapeJude {
 
     private boolean isFullHouse ()
     {
+        Max.clear();
+        //设置两个区域，一个三条的集合，一个对子的集合
+        List<Integer> ThreeKind=new ArrayList<>();
+        List<Integer> Pair=new ArrayList<>();
 
+        //遍历map填充两个集合
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+
+            int rank=entry.getKey();
+            int value=entry.getValue();
+            if(value>3) {
+                return false;
+            }else if(value==3) {
+                ThreeKind.add(rank);
+            } else if (value==2) {
+                Pair.add(rank);
+            }
+        }
+
+        //对两个集合排序
+        ThreeKind.sort((o1, o2) -> o2-o1);
+        Pair.sort((o1, o2) -> o2-o1);
+
+        //填充Max
+        if(ThreeKind.isEmpty())
+        {
             return false;
+        }else if(ThreeKind.size()==2) {
+            Max.addAll(ThreeKind);
+        } else if (ThreeKind.size()==1) {
+            if(Pair.isEmpty()) {
+                return false;
+            }else {
+                Max.addAll(ThreeKind);
+                Max.add(Pair.get(0));
+            }
+        }
+        return true;
+
     }
 
     private boolean isFourOfKind ()
     {
+        Max.clear();
+        int FourKind = 0;
+
+        //判断是否有值是四次
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            if(value==4)
+            {
+                FourKind=key;
+                Max.add(key);
+            }
+        }
+
+        if(FourKind==0)
+        {
             return false;
+        }else
+        {
+            for (Card card : AllCard) {
+                int rank=card.rank.getValue();
+                if(rank!=FourKind) {
+                    Max.add(rank);
+                    return true;
+                }
+            }
+        }
+       return true;
     }
 
     private boolean isStraightFlush ()
     {
+        List<Card> AllFlush=new ArrayList<>();
+        if(isFlush(false,AllFlush)) {
+            return isStraight(AllFlush);
+        }else {
             return false;
+        }
+
     }
 
 
