@@ -14,12 +14,20 @@ public class ShapeJudeTest {
     public static void main(String[] args) {
         ShapeJudeTest shapeJudeTest =new ShapeJudeTest();
         shapeJudeTest.HighCardTest();
-        System.out.println("-----------------------------------");
+        sep();
         shapeJudeTest.OnePairTest();
-        System.out.println("-----------------------------------");
+        sep();
         shapeJudeTest.TwoPairTest();
-        System.out.println("-----------------------------------");
+        sep();
         shapeJudeTest.ThreeKindTest();
+        sep();
+        shapeJudeTest.StraightTest();
+
+    }
+
+    public static void sep()
+    {
+        System.out.println("-----------------------------------");
     }
 
     public void Clear()
@@ -110,6 +118,29 @@ public class ShapeJudeTest {
 
         player.getHands().add(0,new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
         player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.FIVE));
+
+        shapeJude.SetInfo(player,CommunityCard);
+        shapeJude.CardJude();
+
+        System.out.println(shapeJude.getAllCard());
+        System.out.println(player.getMaxShapeCards());
+        System.out.println(player.getShape());
+    }
+
+
+    public void StraightTest()
+    {
+
+        Clear();
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.SEVEN));
+        CommunityCard.add(new Card(Card.Suit.CLUBS, Card.Rank.SIX));
+        CommunityCard.add(new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.SPADES, Card.Rank.THREE));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
+
+
+        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
+        player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.FOUR));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();

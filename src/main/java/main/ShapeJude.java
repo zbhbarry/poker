@@ -5,8 +5,7 @@ import java.util.*;
 public class ShapeJude {
 
 
-    public enum Shape
-    {
+    public enum Shape {
         HIGH_CARD(1),
         ONE_PAIR(2),
         TWO_PAIR(3),
@@ -38,6 +37,7 @@ public class ShapeJude {
         public int getValue() {
             return value;
         }
+
         @Override
         public String toString() {
             return this.name();
@@ -49,11 +49,11 @@ public class ShapeJude {
 
     private List<Card> AllCard;
 
-    private List<Integer> Max;
+    private List<Integer> Max;//存储最大手牌点数
 
     private Player player;
 
-    Map<Integer, Integer> map;
+    Map<Integer, Integer> map;//记录每个点数的出现次数
 
     public List<Integer> getMax() {
         return Max;
@@ -87,17 +87,15 @@ public class ShapeJude {
         AllCard = allCard;
     }
 
-    public ShapeJude()
-    {
-        CommunityCard=new ArrayList<>();
-        AllCard=new ArrayList<>();
-        Max=new ArrayList<>();
-        map=new HashMap<>();
+    public ShapeJude() {
+        CommunityCard = new ArrayList<>();
+        AllCard = new ArrayList<>();
+        Max = new ArrayList<>();
+        map = new HashMap<>();
     }
 
     //信息初始化
-    public void SetInfo(Player player,List<Card> communityCard)
-    {
+    public void SetInfo(Player player, List<Card> communityCard) {
         setPlayer(player);
         setCommunityCard(communityCard);
         AllCard.clear();
@@ -111,19 +109,18 @@ public class ShapeJude {
         Collections.sort(AllCard);//对所有卡牌依据点数排序
     }
 
-    public void CardJude()
-    {
+    public void CardJude() {
 
 
-        if(isStraightFlush()) {
+        if (isStraightFlush()) {
             player.setShape(Shape.STRAIGHT_FLUSH);
-        }else if (isFourOfKind()) {
+        } else if (isFourOfKind()) {
             player.setShape(Shape.FOUR_OF_A_KIND);
         } else if (isFullHouse()) {
             player.setShape(Shape.FULL_HOUSE);
         } else if (isFlush()) {
             player.setShape(Shape.FLUSH);
-        } else if (isStraight()) {
+        } else if (isStraight(AllCard, true)) {
             player.setShape(Shape.STRAIGHT);
         } else if (isThreeOfKind()) {
             player.setShape(Shape.THREE_OF_A_KIND);
@@ -142,16 +139,13 @@ public class ShapeJude {
     }
 
 
-
-    private boolean isHighCard()
-    {
+    private boolean isHighCard() {
 
         Max.clear();
-        Set<Integer> cards=new HashSet<>();
+        Set<Integer> cards = new HashSet<>();
         for (Card card : AllCard) {
-            int rank=card.rank.getValue();
-            if(!cards.add(rank))
-            {
+            int rank = card.rank.getValue();
+            if (!cards.add(rank)) {
                 return false;
             }
         }
@@ -170,8 +164,8 @@ public class ShapeJude {
 
         Max.clear();
         int PairCount = 0;
-        int PairNum=0;
-        int Index=0;
+        int PairNum = 0;
+        int Index = 0;
 
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             int key = entry.getKey();
@@ -184,18 +178,15 @@ public class ShapeJude {
             }
         }
 
-        if (PairCount > 1 || PairCount==0)
-        {
+        if (PairCount > 1 || PairCount == 0) {
             return false;
         }
 
         Max.add(PairNum);
         //添加最大牌值
-        while (Max.size()<4)
-        {
-            int rank=AllCard.get(Index).rank.getValue();
-            if(rank!=PairNum)
-            {
+        while (Max.size() < 4) {
+            int rank = AllCard.get(Index).rank.getValue();
+            if (rank != PairNum) {
                 Max.add(rank);
             }
             Index++;
@@ -205,13 +196,11 @@ public class ShapeJude {
     }
 
 
-
-    private  boolean isTwoPair()
-    {
+    private boolean isTwoPair() {
 
         Max.clear();
 
-        List<Integer> PairNum=new ArrayList<>();
+        List<Integer> PairNum = new ArrayList<>();
 
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             int key = entry.getKey();
@@ -225,19 +214,17 @@ public class ShapeJude {
 
         //对对子的值降序排序
         PairNum.sort((o1, o2) -> o2 - o1);
-        if (PairNum.size() < 2)
-        {
+        if (PairNum.size() < 2) {
             return false;
-        }else if(PairNum.size()>2){
-            PairNum.remove(PairNum.size()-1);
+        } else if (PairNum.size() > 2) {
+            PairNum.remove(PairNum.size() - 1);
         }
 
         Max.addAll(PairNum);
 
         for (Card card : AllCard) {
-            int rank=card.rank.getValue();
-            if(!PairNum.contains(rank))
-            {
+            int rank = card.rank.getValue();
+            if (!PairNum.contains(rank)) {
                 Max.add(rank);
                 return true;
             }
@@ -246,34 +233,30 @@ public class ShapeJude {
     }
 
 
-
-    private boolean isThreeOfKind()
-    {
+    private boolean isThreeOfKind() {
         Max.clear();
-        List<Integer> ThreeKind=new ArrayList<>();
-        int Index=0;
+        List<Integer> ThreeKind = new ArrayList<>();
+        int Index = 0;
 
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
             int key = entry.getKey();
             int value = entry.getValue();
-            if (value > 3 || value==2) {
+            if (value > 3 || value == 2) {
                 return false;
             } else if (value == 3) {
                 ThreeKind.add(key);
             }
         }
 
-        if(ThreeKind.size()==1) {
+        if (ThreeKind.size() == 1) {
             Max.add(ThreeKind.get(0));
-        }else {
+        } else {
             return false;
         }
 
-        while (Max.size()<3)
-        {
-            int rank=AllCard.get(Index).rank.getValue();
-            if(rank!=ThreeKind.get(0))
-            {
+        while (Max.size() < 3) {
+            int rank = AllCard.get(Index).rank.getValue();
+            if (rank != ThreeKind.get(0)) {
                 Max.add(rank);
             }
             Index++;
@@ -283,31 +266,96 @@ public class ShapeJude {
     }
 
 
-    private boolean isStraight()
-    {
-        return false;
+    private boolean isStraight(List<Card> AllCard, boolean store) {
+
+        int MinNum = 0;
+        Set<Integer> ranks = new HashSet<>();
+        for (Card card : AllCard) {
+            ranks.add(card.rank.getValue());
+        }
+
+        if (ranks.size() < 5) {
+            return false;
+        }
+
+        //将set里面的数字放入集合中并且排序
+        List<Integer> storage = new ArrayList<>(ranks);
+        storage.sort(((o1, o2) -> o1 - o2));
+
+        int MinFlag = 0;
+        int count = 0;
+        int LastNum = 0;
+
+        //如果包含‘A’，初始值设置为1;
+        if (AllCard.get(0).rank.getValue() == 14) {
+            MinFlag = 1;
+            LastNum = 1;
+            count++;
+        }
+
+        for(int i = 0; i < storage.size(); i++) {
+            int rank = storage.get(i);
+
+            //设置初始值
+            if (MinFlag == 0) {
+                MinFlag = rank;
+                count++;
+
+            } else {
+                if (rank == LastNum + 1) {
+                    count++;
+                } else if (rank > LastNum + 1) {
+                    MinFlag = rank;
+                    count = 1;
+                }
+            }
+
+            //如果总数到达5，说明有顺子
+            if (count == 5) {
+                MinNum = MinFlag;
+            } else if (count > 5) {
+                MinFlag++;
+                MinNum = MinFlag;
+            }
+
+            LastNum = rank;
+        }
+
+        if (MinNum == 0) {
+            return false;
+        } else {
+
+            if (store) {
+                for (int i = MinNum + 4; i >= MinNum; i--) {
+                    Max.add(i);
+                }
+            }
+            return true;
+        }
+
     }
 
-    private boolean isFlush()
+    private boolean isFlush ()
     {
-        return false;
+            return false;
     }
 
-    private boolean isFullHouse()
+    private boolean isFullHouse ()
     {
 
-        return false;
+            return false;
     }
 
-    private boolean isFourOfKind()
+    private boolean isFourOfKind ()
     {
-        return false;
+            return false;
     }
 
-    private boolean isStraightFlush()
+    private boolean isStraightFlush ()
     {
-        return false;
+            return false;
     }
+
 
 
 }
