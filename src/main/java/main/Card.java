@@ -1,7 +1,12 @@
 package main;
 
-public class Card {
+public class Card implements Comparable<Card>{
 
+
+    @Override
+    public int compareTo(Card OtherCard) {
+        return OtherCard.rank.getValue()-this.rank.getValue();
+    }
 
     public enum Suit {
 

@@ -9,11 +9,11 @@ public class Desk {
 
     private final List<Player> players;
 
-    private final Comparator comparator;
+    private final ShapeJude shapeJude;
 
     public Desk() {
         this.poker=new Poker();
-        this.comparator=new Comparator();
+        this.shapeJude =new ShapeJude();
         this.players=new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             players.add(new Player("player"+i));
@@ -54,17 +54,17 @@ public class Desk {
     public void DealFlop() {
         poker.DealCard();
         for (int i = 0; i < 3; i++) {
-            comparator.getCommunityCard().add(poker.DealCard());
+            shapeJude.getCommunityCard().add(poker.DealCard());
         }
     }
 
     public void DealTurn() {
         poker.DealCard();
-        comparator.getCommunityCard().add(poker.DealCard());
+        shapeJude.getCommunityCard().add(poker.DealCard());
     }
 
     public void DealRiver() {
         poker.DealCard();
-        comparator.getCommunityCard().add(poker.DealCard());
+        shapeJude.getCommunityCard().add(poker.DealCard());
     }
 }

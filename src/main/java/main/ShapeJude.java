@@ -2,7 +2,7 @@ package main;
 
 import java.util.*;
 
-public class Comparator {
+public class ShapeJude {
 
 
     public enum Shape
@@ -20,7 +20,7 @@ public class Comparator {
         private final int value;
 
         // Constructor
-        private Shape(int value) {
+        Shape(int value) {
             this.value = value;
         }
 
@@ -49,15 +49,17 @@ public class Comparator {
 
     private List<Card> AllCard;
 
-    private List<Card> Max;
+    private List<Integer> Max;
 
     private Player player;
 
-    public List<Card> getMax() {
+    Map<Integer, Integer> map;
+
+    public List<Integer> getMax() {
         return Max;
     }
 
-    public void setMax(List<Card> max) {
+    public void setMax(List<Integer> max) {
         Max = max;
     }
 
@@ -85,11 +87,12 @@ public class Comparator {
         AllCard = allCard;
     }
 
-    public Comparator()
+    public ShapeJude()
     {
         CommunityCard=new ArrayList<>();
         AllCard=new ArrayList<>();
-        Max=new ArrayList<>(5);
+        Max=new ArrayList<>();
+        map=new HashMap<>();
     }
 
     //信息初始化
@@ -100,11 +103,16 @@ public class Comparator {
         AllCard.clear();
         AllCard.addAll(this.player.getHands());
         AllCard.addAll(CommunityCard);
+        map.clear();
+        for (Card card : AllCard) {
+            int rank = card.rank.getValue();
+            map.put(rank, map.containsKey(rank) ? map.get(rank) + 1 : 1);
+        }
+        Collections.sort(AllCard);//对所有卡牌依据点数排序
     }
 
     public void CardJude()
     {
-
 
 
         if(isStraightFlush()) {
@@ -139,42 +147,141 @@ public class Comparator {
     {
 
         Max.clear();
-        Set<Card> cards=new HashSet<>();
+        Set<Integer> cards=new HashSet<>();
         for (Card card : AllCard) {
-            if(!cards.add(card))
+            int rank=card.rank.getValue();
+            if(!cards.add(rank))
             {
                 return false;
             }
         }
-        AllCard.sort(new java.util.Comparator<Card>() {
-            @Override
-            public int compare(Card o1, Card o2) {
-                return o2.rank.getValue()-o1.rank.getValue();
-            }
-        });
 
         //添加最大牌值
-        for (int i = 0; i < Max.size(); i++) {
-            Max.add(i,AllCard.get(i));
+        for (int i = 0; i < 5; i++) {
+            Max.add(AllCard.get(i).rank.getValue());
+        }
+
+        return true;
+    }
+
+
+    private boolean isOnePair() {
+
+
+        Max.clear();
+        int PairCount = 0;
+        int PairNum=0;
+        int Index=0;
+
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            if (value >= 3) {
+                return false;
+            } else if (value == 2) {
+                PairCount++;
+                PairNum = key;
+            }
+        }
+
+        if (PairCount > 1 || PairCount==0)
+        {
+            return false;
+        }
+
+        Max.add(PairNum);
+        //添加最大牌值
+        while (Max.size()<4)
+        {
+            int rank=AllCard.get(Index).rank.getValue();
+            if(rank!=PairNum)
+            {
+                Max.add(rank);
+            }
+            Index++;
+        }
+
+        return true;
+    }
+
+
+
+    private  boolean isTwoPair()
+    {
+
+        Max.clear();
+
+        List<Integer> PairNum=new ArrayList<>();
+
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            if (value >= 3) {
+                return false;
+            } else if (value == 2) {
+                PairNum.add(key);
+            }
+        }
+
+        //对对子的值降序排序
+        PairNum.sort((o1, o2) -> o2 - o1);
+        if (PairNum.size() < 2)
+        {
+            return false;
+        }else if(PairNum.size()>2){
+            PairNum.remove(PairNum.size()-1);
+        }
+
+        Max.addAll(PairNum);
+
+        for (Card card : AllCard) {
+            int rank=card.rank.getValue();
+            if(!PairNum.contains(rank))
+            {
+                Max.add(rank);
+                return true;
+            }
         }
         return true;
     }
 
-    private boolean isOnePair()
-    {
-        return false;
 
-    }
-
-    private  boolean isTwoPair()
-    {
-        return false;
-    }
 
     private boolean isThreeOfKind()
     {
-        return false;
+        Max.clear();
+        List<Integer> ThreeKind=new ArrayList<>();
+        int Index=0;
+
+        for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
+            int key = entry.getKey();
+            int value = entry.getValue();
+            if (value > 3 || value==2) {
+                return false;
+            } else if (value == 3) {
+                ThreeKind.add(key);
+            }
+        }
+
+        if(ThreeKind.size()==1) {
+            Max.add(ThreeKind.get(0));
+        }else {
+            return false;
+        }
+
+        while (Max.size()<3)
+        {
+            int rank=AllCard.get(Index).rank.getValue();
+            if(rank!=ThreeKind.get(0))
+            {
+                Max.add(rank);
+            }
+            Index++;
+        }
+        return true;
+
     }
+
 
     private boolean isStraight()
     {

@@ -17,23 +17,23 @@ public class Player {
 
     private List<Card> Hands;
 
-    private List<Card> MaxShapeCards;
+    private List<Integer> MaxShapeCards;
 
-    private Comparator.Shape shape;
+    private ShapeJude.Shape shape;
 
-    public List<Card> getMaxShapeCards() {
+    public List<Integer> getMaxShapeCards() {
         return MaxShapeCards;
     }
 
-    public void setMaxShapeCards(List<Card> maxShapeCards) {
+    public void setMaxShapeCards(List<Integer> maxShapeCards) {
         MaxShapeCards = maxShapeCards;
     }
 
-    public Comparator.Shape getShape() {
+    public ShapeJude.Shape getShape() {
         return shape;
     }
 
-    public void setShape(Comparator.Shape shape) {
+    public void setShape(ShapeJude.Shape shape) {
         this.shape = shape;
     }
 
@@ -81,6 +81,15 @@ public class Player {
        this.name=name;
        this.chips=0;
        this.Hands=new ArrayList<>();
+       this.MaxShapeCards=new ArrayList<>();
+    }
+
+    public void InitPlayer()
+    {
+
+        getHands().clear();
+        setShape(null);
+        getMaxShapeCards().clear();
     }
 
     @Override
