@@ -268,6 +268,7 @@ public class ShapeJude {
 
     private boolean isStraight(List<Card> AllCard, boolean store) {
 
+        Max.clear();
         int MinNum = 0;
         Set<Integer> ranks = new HashSet<>();
         for (Card card : AllCard) {
@@ -337,7 +338,37 @@ public class ShapeJude {
 
     private boolean isFlush ()
     {
-            return false;
+
+         Max.clear();
+         Map<Card.Suit,List<Integer>> SuitMap=new HashMap<>();
+
+         //将同花色的卡牌写入对应的集合
+         for (Card card : AllCard) {
+             Card.Suit suit=card.suit;
+             int rank=card.rank.getValue();
+             if(!SuitMap.containsKey(suit)) {
+                 List<Integer> ranks=new ArrayList<>();
+                 ranks.add(rank);
+                 SuitMap.put(suit,ranks);
+             }else {
+                 SuitMap.get(suit).add(rank);
+             }
+         }
+
+
+         //判断是否有花色的数量超过4张
+         for (Map.Entry<Card.Suit, List<Integer>> entry : SuitMap.entrySet()) {
+            Card.Suit suit=entry.getKey();
+            List<Integer> ranks=entry.getValue();
+            if(ranks.size()>=5) {
+                ranks.sort((o1, o2) -> o2-o1);
+                Max.addAll(ranks.subList(0,5));
+                return true;
+            }
+         }
+
+         return false;
+
     }
 
     private boolean isFullHouse ()

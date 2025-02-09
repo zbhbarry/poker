@@ -22,6 +22,8 @@ public class ShapeJudeTest {
         shapeJudeTest.ThreeKindTest();
         sep();
         shapeJudeTest.StraightTest();
+        sep();
+        shapeJudeTest.FlushTest();
 
     }
 
@@ -141,6 +143,29 @@ public class ShapeJudeTest {
 
         player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
         player.getHands().add(0,new Card(Card.Suit.CLUBS, Card.Rank.FOUR));
+
+        shapeJude.SetInfo(player,CommunityCard);
+        shapeJude.CardJude();
+
+        System.out.println(shapeJude.getAllCard());
+        System.out.println(player.getMaxShapeCards());
+        System.out.println(player.getShape());
+    }
+
+
+    public void FlushTest()
+    {
+
+        Clear();
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.SEVEN));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.SIX));
+        CommunityCard.add(new Card(Card.Suit.DIAMONDS, Card.Rank.ACE));
+        CommunityCard.add(new Card(Card.Suit.SPADES, Card.Rank.THREE));
+        CommunityCard.add(new Card(Card.Suit.HEARTS, Card.Rank.TWO));
+
+
+        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FIVE));
+        player.getHands().add(0,new Card(Card.Suit.HEARTS, Card.Rank.FOUR));
 
         shapeJude.SetInfo(player,CommunityCard);
         shapeJude.CardJude();
