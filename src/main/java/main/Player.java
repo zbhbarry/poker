@@ -3,23 +3,27 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
+public abstract class Player implements SelectAction{
+
+
+    private int chips;//剩余筹码数量
+
+    private int CurrentBet;//当前下注量
+
+    private int  isFold;//是否弃牌
+
+    private int Position;//位置
+
+    private String name;//名字
+
+    private List<Card> Hands;//手牌
+
+    private List<Integer> MaxShapeCards;//最大手牌集合
+
+    private ShapeJude.Shape shape;//手牌强度
 
 
 
-    private int chips;
-
-    private int CurrentBet;
-
-    private int Position;
-
-    private String name;
-
-    private List<Card> Hands;
-
-    private List<Integer> MaxShapeCards;
-
-    private ShapeJude.Shape shape;
 
     public List<Integer> getMaxShapeCards() {
         return MaxShapeCards;
@@ -77,10 +81,19 @@ public class Player {
         Hands = hands;
     }
 
+    public int getIsFold() {
+        return isFold;
+    }
+
+    public void setIsFold(int isFold) {
+        this.isFold = isFold;
+    }
+
     public Player(String name) {
        this.name=name;
        this.chips=0;
-       this.Hands=new ArrayList<>();
+       this.isFold=0;
+       this.Hands=new ArrayList<>(2);
        this.MaxShapeCards=new ArrayList<>();
     }
 
@@ -89,7 +102,9 @@ public class Player {
         getHands().clear();
         setShape(null);
         getMaxShapeCards().clear();
+        setIsFold(0);
     }
+
 
     @Override
     public String toString() {
@@ -97,4 +112,5 @@ public class Player {
         +getHands().get(1).toString()
         + ","+"有"+chips+"筹码,";
     }
+
 }

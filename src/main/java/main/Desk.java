@@ -5,19 +5,57 @@ import java.util.List;
 
 public class Desk {
 
-    private final Poker poker;
+    private Poker poker;
 
     private final List<Player> players;
 
     private final ShapeJude shapeJude;
 
-    public Desk() {
+    private int GameRound;
+    
+
+    public Poker getPoker() {
+        return poker;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public ShapeJude getShapeJude() {
+        return shapeJude;
+    }
+
+    public int getGameRound() {
+        return GameRound;
+    }
+
+    public void setGameRound(int gameRound) {
+        GameRound = gameRound;
+    }
+
+    public Desk(List<Player> players) {
         this.poker=new Poker();
         this.shapeJude =new ShapeJude();
-        this.players=new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            players.add(new Player("player"+i));
+        this.players=players;
+
+    }
+
+    //表示一轮游戏
+    public void round()
+    {
+
+        //数据初始化\
+        {
+            poker = new Poker();
+            shapeJude.getCommunityCard().clear();
+            for (Player player : players) {
+                player.InitPlayer();
+            }
+            
         }
+
+        DealPosition();
         DealHands();
         DealFlop();
         DealTurn();
@@ -40,15 +78,20 @@ public class Desk {
             System.out.println("---------------------------------");
 
         }
+        System.out.println("                              ");
     }
 
-    public Poker getPoker() {
-        return poker;
+    
+    public void DealPosition()
+    {
+        Player player=players.get(0);
+        players.remove(0);
+        players.add(player);
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).setPosition(i);
+        }
     }
 
-    public List<Player> getPlayers() {
-        return players;
-    }
 
     public void DealHands() {
         int i=0;
@@ -58,6 +101,7 @@ public class Desk {
             }
             i++;
         }
+        GameRound=1;
     }
 
     public void DealFlop() {
@@ -65,15 +109,18 @@ public class Desk {
         for (int i = 0; i < 3; i++) {
             shapeJude.getCommunityCard().add(poker.DealCard());
         }
+        GameRound=2;
     }
 
     public void DealTurn() {
         poker.DealCard();
         shapeJude.getCommunityCard().add(poker.DealCard());
+        GameRound=3;
     }
 
     public void DealRiver() {
         poker.DealCard();
         shapeJude.getCommunityCard().add(poker.DealCard());
+        GameRound=4;
     }
 }
