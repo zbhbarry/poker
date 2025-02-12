@@ -302,9 +302,7 @@ public class ShapeJude {
             count++;
         }
 
-        for(int i = 0; i < storage.size(); i++) {
-            int rank = storage.get(i);
-
+        for (int rank : storage) {
             //设置初始值
             if (MinFlag == 0) {
                 MinFlag = rank;

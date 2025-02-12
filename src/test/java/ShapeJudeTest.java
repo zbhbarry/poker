@@ -10,7 +10,7 @@ public class ShapeJudeTest {
 
     main.ShapeJude shapeJude =new main.ShapeJude();
     List<Card> CommunityCard =new ArrayList<>();
-    Player player=new AiPlayer("li");
+    Player player=new AiPlayer("li",3000);
 
     public static void main(String[] args) {
 

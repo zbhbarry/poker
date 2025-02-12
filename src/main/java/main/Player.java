@@ -3,14 +3,54 @@ package main;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Player implements SelectAction{
+public abstract class Player {
 
 
+    public enum Action
+    {
+
+        FOLD(0),
+        CHECK(1),
+        CALL(2),
+        BET(3),
+        BET_10(4),
+        BET_25(5),
+        BET_50(6),
+        RAISE_2(7),
+        RAISE_3(8),
+        POT(9),
+        POT_2(10),
+        POT_HALF(11),
+        ALLIN(12);
+
+        private final int value;
+
+        Action(int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static Action fromValue(int value) {
+            for (Action action : Action.values()) {
+                if (action.getValue() == value) {
+                    return action;
+                }
+            }
+            throw new IllegalArgumentException("No Action found for value: " + value);
+        }
+    }
+
+    //变量
     private int chips;//剩余筹码数量
 
     private int CurrentBet;//当前下注量
 
-    private int  isFold;//是否弃牌
+    private int isFold;//是否弃牌
+
+    private int isAllIn;//是否全压
 
     private int Position;//位置
 
@@ -23,8 +63,7 @@ public abstract class Player implements SelectAction{
     private ShapeJude.Shape shape;//手牌强度
 
 
-
-
+    //java bean
     public List<Integer> getMaxShapeCards() {
         return MaxShapeCards;
     }
@@ -89,10 +128,20 @@ public abstract class Player implements SelectAction{
         this.isFold = isFold;
     }
 
-    public Player(String name) {
+    public int getIsAllIn() {
+        return isAllIn;
+    }
+
+    public void setIsAllIn(int isAllIn) {
+        this.isAllIn = isAllIn;
+    }
+
+    public Player(String name,int chips) {
        this.name=name;
-       this.chips=0;
        this.isFold=0;
+       this.isAllIn=0;
+       this.CurrentBet=0;
+       this.chips=chips;
        this.Hands=new ArrayList<>(2);
        this.MaxShapeCards=new ArrayList<>();
     }
@@ -103,8 +152,14 @@ public abstract class Player implements SelectAction{
         setShape(null);
         getMaxShapeCards().clear();
         setIsFold(0);
+        setIsAllIn(0);
+        setCurrentBet(0);
+        if(chips<=0) {
+            setChips(3000);
+        }
     }
 
+    public abstract Action SelectAction(double[] state,List<Action> validActions);
 
     @Override
     public String toString() {
