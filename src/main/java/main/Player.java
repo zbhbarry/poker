@@ -54,6 +54,8 @@ public abstract class Player {
 
     private int TotalBet;//这个回合的总投入量
 
+    private int SpaceBet;//剩余投入量
+
     private int isFold;//是否弃牌
 
     private int isAllIn;//是否全压
@@ -69,6 +71,8 @@ public abstract class Player {
     private List<Integer> MaxShapeCards;//最大手牌集合
 
     private ShapeJude.Shape shape;//手牌强度
+
+    private int RaiseNum;//加注次数
 
 
     //java bean
@@ -102,6 +106,14 @@ public abstract class Player {
 
     public void setOriginChips(int originChips) {
         OriginChips = originChips;
+    }
+
+    public int getSpaceBet() {
+        return SpaceBet;
+    }
+
+    public void setSpaceBet(int spaceBet) {
+        SpaceBet = spaceBet;
     }
 
     public int getPredictiveChips() {
@@ -176,6 +188,14 @@ public abstract class Player {
         TotalBet = totalBet;
     }
 
+    public int getRaiseNum() {
+        return RaiseNum;
+    }
+
+    public void setRaiseNum(int raiseNum) {
+        RaiseNum = raiseNum;
+    }
+
     public Player(String name, int chips) {
        this.name=name;
        this.isFold=0;
@@ -188,6 +208,8 @@ public abstract class Player {
        this.Hands=new ArrayList<>(2);
        this.MaxShapeCards=new ArrayList<>();
        this.TotalBet=0;
+       this.SpaceBet=0;
+       this.RaiseNum=0;
     }
 
     public void InitPlayer()
@@ -200,11 +222,13 @@ public abstract class Player {
         setCurrentBet(0);
         setIsWin(0);
         setTotalBet(0);
+        setSpaceBet(0);
         if(chips<=0) {
             setChips(3000);
         }
         setOriginChips(chips);
         setPredictiveChips(0);
+        setRaiseNum(0);
     }
 
     public abstract Action SelectAction(double[] state,List<Action> validActions);

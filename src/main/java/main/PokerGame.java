@@ -39,7 +39,7 @@ public class PokerGame {
 
         int i=1;
 
-        while (true) {
+        while (i<600) {
             System.out.println("---------------第" + i + "局----------------");
             desk.round();
             i++;

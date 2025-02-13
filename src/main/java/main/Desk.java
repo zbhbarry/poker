@@ -234,6 +234,7 @@ public class Desk {
 
         for (Player player : players) {
             player.setTotalBet(player.getTotalBet()+player.getCurrentBet());
+            player.setSpaceBet(player.getTotalBet());
             player.setCurrentBet(0);
         }
 
@@ -263,6 +264,12 @@ public class Desk {
         List<Player> Winners = getPlayerList();
 
         setIfWin_fold(Winners);
+
+        for (Player winner : Winners) {
+            if(winner.getIsFold()==1 && winner.getIsWin()==1){
+                System.out.println(winner.getName()+"虽然弃牌了，但是也可以赢");
+            }
+        }
 
         Winners.removeIf(player -> player.getIsFold() == 1);
 
@@ -345,6 +352,8 @@ public class Desk {
                 player.setIsWin(1);
             }
         }
+
+
     }
 
     //设置没弃牌玩家是否赢了
@@ -362,7 +371,10 @@ public class Desk {
     }
 
     //分配底池
-    private void distributePot(List<Player> winners) {
+    private void distributePot(List<Player> Winners) {
+
+        List<Player> winners =new ArrayList<>(Winners);
+        List<Player> finish=new ArrayList<>();
 
         do {
 
@@ -386,11 +398,11 @@ public class Desk {
                 }
 
 
-
                 winners.removeAll(firstClass);
 
                 List<Player> otherClass = new ArrayList<>(players);
                 otherClass.removeAll(firstClass);
+                otherClass.removeAll(finish);
                 int sumWinner = 0;
 
                 for (Player player : firstClass) {
@@ -398,18 +410,22 @@ public class Desk {
                 }
 
                 for (Player player : firstClass) {
-                    int shouldWin = player.getTotalBet();
+                    int shouldWin = player.getSpaceBet();
                     for (Player other : otherClass) {
-                        if (sumWinner <= other.getTotalBet()) {
+                        if (sumWinner <= other.getSpaceBet()) {
                             shouldWin += player.getTotalBet();
+                            other.setSpaceBet(other.getSpaceBet()-player.getTotalBet());
                         } else {
-                            shouldWin += (int) (((double) player.getTotalBet() / sumWinner) * other.getTotalBet());
-
+                            int curWin=(int) (((double) player.getTotalBet() / sumWinner) * other.getSpaceBet());
+                            shouldWin += curWin;
+                            other.setSpaceBet(other.getSpaceBet()-curWin);
                         }
                     }
                     player.setChips(player.getChips()+shouldWin);
                     bet.setPot(bet.getPot()-shouldWin);
                 }
+                finish.addAll(firstClass);
+
                 if(winners.isEmpty()) {
                     bet.setPot(0);
                 }

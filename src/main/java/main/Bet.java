@@ -173,55 +173,66 @@ public class Bet {
                 player.setCurrentBet(betNum);
                 player.setChips(chipsNum-betNum);
                 MinBet=betNum;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case BET_25 -> {
                 betNum=(int) (chipsNum * 0.25);
                 player.setCurrentBet(betNum);
                 player.setChips(chipsNum-betNum);
                 MinBet=betNum;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case BET_50 -> {
                 betNum=(int) (chipsNum * 0.5);
                 player.setCurrentBet(betNum);
                 player.setChips(chipsNum-betNum);
                 MinBet=betNum;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case RAISE_2 -> {
                 betNum= MinBet*2-currentBet;
                 player.setCurrentBet(MinBet*2);
                 player.setChips(chipsNum-betNum);
                 MinBet=MinBet*2;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case RAISE_3 -> {
                 betNum=MinBet*3-currentBet;
                 player.setCurrentBet(MinBet*3);
                 player.setChips(chipsNum-betNum);
                 MinBet=MinBet*3;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case POT -> {
                 betNum=pot-currentBet;
                 player.setCurrentBet(pot);
                 player.setChips(chipsNum-betNum);
                 MinBet=pot;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case POT_2 -> {
                 betNum=pot*2-currentBet;
                 player.setCurrentBet(pot*2);
                 player.setChips(chipsNum-betNum);
                 MinBet=pot*2;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case POT_HALF -> {
                 betNum=pot/2-currentBet;
                 player.setCurrentBet(pot/2);
                 player.setChips(chipsNum-betNum);
                 MinBet=pot/2;
+                player.setRaiseNum(player.getRaiseNum()+1);
             }
             case ALLIN -> {
                 betNum=chipsNum;
                 player.setCurrentBet(chipsNum+currentBet);
                 player.setChips(0);
                 player.setIsAllIn(1);
-                if(MinBet < chipsNum) MinBet=chipsNum+currentBet;
+                if(MinBet < chipsNum) {
+                    MinBet = chipsNum + currentBet;
+                    player.setRaiseNum(player.getRaiseNum()+1);
+                }
             }
             default -> System.out.println("未知动作");
         }
