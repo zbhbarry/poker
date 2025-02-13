@@ -21,7 +21,7 @@ public class PokerGame {
         Player player3=new AiPlayer("AI_3",CHIPS);
         Player player4=new AiPlayer("AI_4",CHIPS);
         Player player5=new AiPlayer("AI_5",CHIPS);
-        Player player6=new HumanPlayer("HUMAN",CHIPS);
+        Player player6=new AiPlayer("AI_6",CHIPS);
 
 
 
@@ -33,13 +33,18 @@ public class PokerGame {
         players.add(player5);
 
 
+
+
         Desk desk=new Desk(players);
 
-        for (int i = 1; i < 6; i++) {
+        int i=1;
 
-            System.out.println("---------------第"+i+"局----------------");
+        while (true) {
+            System.out.println("---------------第" + i + "局----------------");
             desk.round();
+            i++;
         }
+
 
 
 

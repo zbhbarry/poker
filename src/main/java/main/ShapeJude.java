@@ -96,16 +96,16 @@ public class ShapeJude {
 
     //信息初始化
     public void SetInfo(Player player, List<Card> communityCard) {
-        setPlayer(player);
+        this.player=player;
         if(CommunityCard==null) {
             setCommunityCard(communityCard);//为了写测试类
         }
-
         //清空上一个的玩家的所有牌和map工具
         AllCard.clear();
         AllCard.addAll(this.player.getHands());
         AllCard.addAll(CommunityCard);
         map.clear();
+        Max.clear();
 
         //重新载入map
         for (Card card : AllCard) {

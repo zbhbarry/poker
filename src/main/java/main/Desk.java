@@ -72,58 +72,84 @@ public class Desk {
             LivePlayer=new HashSet<>(players);
         }
 
+        //分位置
         DealPosition();
         //getPlayerInfo();
         System.out.println(" ");
 
-
+        //手牌轮
         DealHands();
+        //setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
+        //翻牌轮
         DealFlop();
+        //setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
+        //转牌轮
         DealTurn();
+        //setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
+        //河牌轮
         DealRiver();
+        //setPlayerShape();
         BetRound();
+        //getPlayerInfo();
+
+
+        setPlayerShape();
         getPlayerInfo();
+
 
         JudeWinner();
 
 
-        //测试判断是否准确;
-        System.out.print("存活的玩家: ");
+        getLiverPlayerInfo();
+
+
+    }
+
+    public void setPlayerShape() {
+
         for (Player player : players) {
-            if(player.getIsFold()!=1)
-            {
-                System.out.print(player.getName()+"  ");
+            if(!shapeJude.getCommunityCard().isEmpty()) {
+
+                shapeJude.SetInfo(player, null);
+                shapeJude.CardJude();
+
             }
+        }
+
+    }
+
+    public void getLiverPlayerInfo()
+    {
+        //测试判断是否准确;
+        System.out.println("存活的玩家: ");
+        for (Player player : LivePlayer) {
+            //System.out.print(player.getName()+",");
+            System.out.print(player.getName()+"的起始筹码量是"+player.getOriginChips()+",");
+            System.out.println(player.getName()+"的当前筹码数量是"+player.getChips());
         }
         System.out.println(" ");
         System.out.println("---------------------------------");
-
     }
 
     public void getPlayerInfo()
     {
         // System.out.println("第" + GameRound + "回合");
         System.out.println("公共牌是"+shapeJude.getCommunityCard());
+        setPlayerShape();
         for (Player player : players) {
 
             String name=player.getName();
 
-            if(!shapeJude.getCommunityCard().isEmpty()) {
-                shapeJude.SetInfo(player,null);
-                shapeJude.CardJude();
-            }
-
             System.out.print(name+"的手牌是"+player.getHands()+",");
-            System.out.print(name+"的所有手牌加公共牌是"+shapeJude.getAllCard()+",");
             System.out.print(name+"的最大组成牌是"+player.getMaxShapeCards()+",");
             System.out.print(name+"的最大牌型是"+player.getShape()+",");
             System.out.print(name+"的总下注量"+player.getTotalBet()+",");
@@ -133,7 +159,6 @@ public class Desk {
         }
     }
 
-    
     public void DealPosition()
     {
         Player player=players.get(0);
@@ -235,7 +260,32 @@ public class Desk {
     public void JudeWinner()
     {
 
-        List<Player> Winners=new ArrayList<>(players);
+        List<Player> Winners = getPlayerList();
+
+        setIfWin_fold(Winners);
+
+        Winners.removeIf(player -> player.getIsFold() == 1);
+
+
+        System.out.println("底池数量是 :"+bet.getPot());
+        //查看存活玩家信息
+        for (Player player : Winners) {
+            System.out.println(player.getName() +"    "
+                    + player.getShape() +"    "
+                    + player.getMaxShapeCards()+"   "
+                    + player.getTotalBet()
+            );
+        }
+
+        distributePot(Winners);
+
+        setIfWin_noFold(Winners);
+
+    }
+
+    //对玩家集合通过大小排序
+    private List<Player> getPlayerList() {
+        List<Player> Winners = new ArrayList<>(players);
         Winners.sort(new Comparator<Player>() {
             @Override
             public int compare(Player o1, Player o2) {
@@ -250,25 +300,29 @@ public class Desk {
             }
 
         });
-
-        setIfWin_fold(Winners);
-
-        Winners.removeIf(player -> player.getIsFold() == 1);
-
-        distributePot(Winners);
-
-        setIfWin_noFold(Winners);
-
+        System.out.println("排序后");
+        for (Player player : Winners) {
+            System.out.println(player.getName()+"   "+player.getShape()+"  "+player.getMaxShapeCards());
+        }
+        System.out.println("  ");
+        return Winners;
     }
 
     // 牌型相同时，比较最大牌
     private int compareMaxCards(List<Integer> cards1, List<Integer> cards2) {
-        for (int i = 0; i < cards1.size(); i++) {
-            if (cards1.get(i) > cards2.get(i)) return -1; // o1 牌大
-            if (cards1.get(i) < cards2.get(i)) return 1;  // o2 牌大
+        int size = Math.min(cards1.size(), cards2.size());
+
+        for (int i = 0; i < size; i++) {
+            int comparison = Integer.compare(cards2.get(i), cards1.get(i)); // 降序排列
+            if (comparison != 0) {
+                return comparison;  // 找到不同的牌，直接返回比较结果
+            }
         }
-        return 0; // 完全相同，平局
+
+        // 如果所有元素都相同，返回 0，表示平局
+        return 0;
     }
+
 
     //用于判断弃牌选手是否可以赢得比赛
     private void setIfWin_fold(List<Player> winners)
@@ -331,6 +385,8 @@ public class Desk {
                     }
                 }
 
+
+
                 winners.removeAll(firstClass);
 
                 List<Player> otherClass = new ArrayList<>(players);
@@ -342,7 +398,7 @@ public class Desk {
                 }
 
                 for (Player player : firstClass) {
-                    int shouldWin = 0;
+                    int shouldWin = player.getTotalBet();
                     for (Player other : otherClass) {
                         if (sumWinner <= other.getTotalBet()) {
                             shouldWin += player.getTotalBet();
@@ -354,9 +410,15 @@ public class Desk {
                     player.setChips(player.getChips()+shouldWin);
                     bet.setPot(bet.getPot()-shouldWin);
                 }
+                if(winners.isEmpty()) {
+                    bet.setPot(0);
+                }
 
             }
-        }while (!winners.isEmpty());
+
+
+
+        }while (bet.getPot()!=0);
 
     }
 

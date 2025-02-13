@@ -73,11 +73,11 @@ public abstract class Player {
 
     //java bean
     public List<Integer> getMaxShapeCards() {
-        return MaxShapeCards;
+        return new ArrayList<>(MaxShapeCards); //  返回副本，防止外部修改
     }
 
     public void setMaxShapeCards(List<Integer> maxShapeCards) {
-        MaxShapeCards = maxShapeCards;
+        this.MaxShapeCards = new ArrayList<>(maxShapeCards); //  存储一个新的 List，避免数据共享
     }
 
     public ShapeJude.Shape getShape() {
