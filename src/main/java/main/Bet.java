@@ -112,7 +112,6 @@ public class Bet {
         // 1. 默认可选操作
         actions.add(Player.Action.FOLD);
 
-
         // 2. 如果没有下注（MinBet == 0）
         if (MinBet == 0) {
             actions.add(Player.Action.CHECK); // 可以选择过牌
@@ -227,8 +226,16 @@ public class Bet {
             default -> System.out.println("未知动作");
         }
 
+
         setPot(pot+betNum);
 
+
+
+
+    }
+
+    public void getBetInfo(Player player, Player.Action action,int betNum)
+    {
         System.out.println((player.getName()
                 + " 的动作是: " + action
                 + " 下注筹码量: " + betNum
@@ -237,8 +244,9 @@ public class Bet {
                 + " 底池数量是: " + pot
         ));
 
-
     }
+
+
 
 
 

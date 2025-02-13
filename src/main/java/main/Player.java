@@ -46,11 +46,19 @@ public abstract class Player {
     //变量
     private int chips;//剩余筹码数量
 
+    private int OriginChips;//初始筹码数量
+
+    private int PredictiveChips;//预期可以赢得的筹码数量
+
     private int CurrentBet;//当前下注量
+
+    private int TotalBet;//这个回合的总投入量
 
     private int isFold;//是否弃牌
 
     private int isAllIn;//是否全压
+
+    private int isWin;//是否赢了
 
     private int Position;//位置
 
@@ -86,6 +94,22 @@ public abstract class Player {
 
     public void setChips(int chips) {
         this.chips = chips;
+    }
+
+    public int getOriginChips() {
+        return OriginChips;
+    }
+
+    public void setOriginChips(int originChips) {
+        OriginChips = originChips;
+    }
+
+    public int getPredictiveChips() {
+        return PredictiveChips;
+    }
+
+    public void setPredictiveChips(int predictiveChips) {
+        PredictiveChips = predictiveChips;
     }
 
     public int getCurrentBet() {
@@ -136,14 +160,34 @@ public abstract class Player {
         this.isAllIn = isAllIn;
     }
 
-    public Player(String name,int chips) {
+    public int getIsWin() {
+        return isWin;
+    }
+
+    public void setIsWin(int isWin) {
+        this.isWin = isWin;
+    }
+
+    public int getTotalBet() {
+        return TotalBet;
+    }
+
+    public void setTotalBet(int totalBet) {
+        TotalBet = totalBet;
+    }
+
+    public Player(String name, int chips) {
        this.name=name;
        this.isFold=0;
        this.isAllIn=0;
        this.CurrentBet=0;
        this.chips=chips;
+       this.isWin=0;
+       this.PredictiveChips=0;
+       this.OriginChips=0;
        this.Hands=new ArrayList<>(2);
        this.MaxShapeCards=new ArrayList<>();
+       this.TotalBet=0;
     }
 
     public void InitPlayer()
@@ -154,9 +198,13 @@ public abstract class Player {
         setIsFold(0);
         setIsAllIn(0);
         setCurrentBet(0);
+        setIsWin(0);
+        setTotalBet(0);
         if(chips<=0) {
             setChips(3000);
         }
+        setOriginChips(chips);
+        setPredictiveChips(0);
     }
 
     public abstract Action SelectAction(double[] state,List<Action> validActions);
