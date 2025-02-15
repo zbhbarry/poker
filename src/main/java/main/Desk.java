@@ -256,7 +256,6 @@ public class Desk {
         return false;
     }
 
-
     //判断赢家并分配底池
     public void JudeWinner()
     {
@@ -308,7 +307,9 @@ public class Desk {
 
         });
         System.out.println("排序后");
-        for (Player player : Winners) {
+        for (int i = 0; i < Winners.size(); i++) {
+            Player player=Winners.get(i);
+            player.setRank(Winners.size()-i);
             System.out.println(player.getName()+"   "+player.getShape()+"  "+player.getMaxShapeCards());
         }
         System.out.println("  ");

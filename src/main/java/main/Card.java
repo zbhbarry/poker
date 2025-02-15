@@ -10,10 +10,10 @@ public class Card implements Comparable<Card>{
 
     public enum Suit {
 
-        SPADES(0,"♠"),
-        HEARTS(1,"♥"),
-        DIAMONDS(2,"♦"),
-        CLUBS(3,"♣");
+        SPADES(1,"♠"),
+        HEARTS(2,"♥"),
+        DIAMONDS(3,"♦"),
+        CLUBS(4,"♣");
 
         private final int value;
 
@@ -91,6 +91,30 @@ public class Card implements Comparable<Card>{
     Rank rank;
 
     private String imagePath;
+
+    public Suit getSuit() {
+        return suit;
+    }
+
+    public void setSuit(Suit suit) {
+        this.suit = suit;
+    }
+
+    public Rank getRank() {
+        return rank;
+    }
+
+    public void setRank(Rank rank) {
+        this.rank = rank;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public Card(Suit suit, Rank rank) {
         this.suit = suit;

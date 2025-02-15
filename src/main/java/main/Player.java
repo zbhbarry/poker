@@ -74,6 +74,8 @@ public abstract class Player {
 
     private int RaiseNum;//加注次数
 
+    private int rank;//玩家排名
+
 
     //java bean
     public List<Integer> getMaxShapeCards() {
@@ -82,6 +84,14 @@ public abstract class Player {
 
     public void setMaxShapeCards(List<Integer> maxShapeCards) {
         this.MaxShapeCards = new ArrayList<>(maxShapeCards); //  存储一个新的 List，避免数据共享
+    }
+
+    public int getRank() {
+        return rank;
+    }
+
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     public ShapeJude.Shape getShape() {
@@ -210,6 +220,7 @@ public abstract class Player {
        this.TotalBet=0;
        this.SpaceBet=0;
        this.RaiseNum=0;
+       this.rank=-1;
     }
 
     public void InitPlayer()
@@ -229,6 +240,7 @@ public abstract class Player {
         setOriginChips(chips);
         setPredictiveChips(0);
         setRaiseNum(0);
+        setRank(-1);
     }
 
     public abstract Action SelectAction(double[] state,List<Action> validActions);
