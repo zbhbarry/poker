@@ -15,7 +15,7 @@ public class Poker {
     public Poker()
     {
         cards=new ArrayList<>();
-        for (int i = 0; i <= 3; i++) {
+        for (int i = 1; i <= 4; i++) {
             for (int j = 2; j <=14; j++) {
                 cards.add(new Card(Card.Suit.fromValue(i), Card.Rank.fromValue(j)));
             }

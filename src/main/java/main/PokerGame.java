@@ -1,7 +1,11 @@
 package main;
 
 
+import AiModel.Step;
+
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PokerGame {
@@ -39,10 +43,21 @@ public class PokerGame {
 
         int i=1;
 
-        while (i<600) {
+        while (i<2) {
             System.out.println("---------------第" + i + "局----------------");
             desk.round();
             i++;
+            for (Player player : desk.getPlayers()) {
+                AiPlayer aiPlayer=(AiPlayer) player;
+                for (Step step : aiPlayer.getSteps()) {
+                    for (double state : step.getStates()) {
+                        System.out.print(state);
+                        System.out.print("      ");
+                    }
+                    System.out.println(" ");
+                }
+                System.out.println(" ");
+            }
         }
 
 

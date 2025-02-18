@@ -9,112 +9,18 @@ import java.util.List;
 public class State {
 
 
-    Player player;
-    private int PlayerSize;
-
-    private int Liver;
-
-    private int TotalPot;
-
-    private int pot;
-
-    private int TotalRaise;
-
-    private List<Integer> betPlayers;
-
-    private List<Integer> RaisePlayers;
-
-    private List<Card> communityCards;
-
-    public Player getPlayer() {
-        return player;
-    }
-
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
-
-    public int getPlayerSize() {
-        return PlayerSize;
-    }
-
-    public void setPlayerSize(int playerSize) {
-        PlayerSize = playerSize;
-    }
-
-    public int getLiver() {
-        return Liver;
-    }
-
-    public void setLiver(int liver) {
-        Liver = liver;
-    }
-
-    public int getTotalPot() {
-        return TotalPot;
-    }
-
-    public void setTotalPot(int totalPot) {
-        TotalPot = totalPot;
-    }
-
-    public int getPot() {
-        return pot;
-    }
-
-    public void setPot(int pot) {
-        this.pot = pot;
-    }
-
-    public int getTotalRaise() {
-        return TotalRaise;
-    }
-
-    public void setTotalRaise(int totalRaise) {
-        TotalRaise = totalRaise;
-    }
-
-    public List<Integer> getBetPlayers() {
-        return betPlayers;
-    }
-
-    public void setBetPlayers(List<Integer> betPlayers) {
-        this.betPlayers = betPlayers;
-    }
-
-    public List<Integer> getRaisePlayers() {
-        return RaisePlayers;
-    }
-
-    public void setRaisePlayers(List<Integer> raisePlayers) {
-        RaisePlayers = raisePlayers;
-    }
-
-    public List<Card> getCommunityCards() {
-        return communityCards;
-    }
-
-    public void setCommunityCards(List<Card> communityCards) {
-        this.communityCards = communityCards;
-    }
-
-    public State(Player player, int playerSize, int liver, int TotalPot, int pot, int TotalRaise, List<Card> communityCards) {
-        this.PlayerSize = playerSize;
-        this.Liver=liver;
-        this.TotalPot=TotalPot;
-        this.pot=pot;
-        this.TotalRaise=TotalRaise;
-        this.betPlayers=new ArrayList<>();
-        this.RaisePlayers=new ArrayList<>();
-        this.communityCards=communityCards;
-    }
-
-
-
-    public double[] getState()
-    {
+    public double[] getState(Player player,
+                             int round,
+                             int playerSize,
+                             int liver,
+                             int TotalPot,
+                             int pot,
+                             int TotalRaise,
+                             List<Card> communityCards,
+                             List<Player> players) {
         List<Double> states=new ArrayList<>();
         /*
+        - 回合数
         - 玩家人数
         - 本轮活跃玩家（未弃牌玩家）人数
         - 玩家位置
@@ -125,29 +31,66 @@ public class State {
         - 每位玩家的加注次数
         - 手牌
         - 桌面牌
-        - 手牌和牌桌排名的组合
+        //- 手牌和牌桌排名的组合
         - 手牌与牌桌实力的组合
-        - 手牌与牌桌潜力的组合
+        //- 手牌与牌桌潜力的组合
         */
-        states.add((double) PlayerSize);
-        states.add((double) Liver);
+        states.add((double) (round/4));
+        states.add((double) playerSize);
+        states.add((double) liver);
         states.add((double) player.getPosition());
-        states.add((double) pot/TotalPot);
-        states.add((double) (player.getCurrentBet()/pot));
-        states.add((double) (player.getRaiseNum()/TotalRaise));
-        for (Integer integer : betPlayers) {
-            states.add((double) (integer/pot));
+        states.add((double)pot/TotalPot);//玩家总筹码量的百分比
+        states.add((double)player.getTotalBet()/pot);//玩家下注量和底池的比较
+
+        if(TotalRaise==0) {
+            states.add((double) 0);//玩家的加注次数和所有玩家总加注次数比较
+        }else {
+            states.add((double) player.getRaiseNum()/TotalRaise);//玩家的加注次数和所有玩家总加注次数比较
         }
-        for (Integer integer : RaisePlayers) {
-            states.add((double) (integer/TotalRaise));
+
+
+        for (Player other : players) {
+            if (other != player) {
+                states.add( (double)other.getTotalBet() / pot);
+            }
         }
+
+        if(TotalRaise==0) {
+            for (Player other : players) {
+                if(other!=player) {
+                    states.add((double) 0);
+                }
+            }
+        }else {
+            for (Player other : players) {
+                if(other!=player) {
+                    states.add((double) other.getRaiseNum()/TotalRaise);
+                }
+            }//玩家的加注次数和所有玩家总加注次数比较
+        }
+
         states.add(getCardVector(player.getHands().get(0)));
         states.add(getCardVector(player.getHands().get(1)));
-        for (Card card : communityCards) {
-            states.add(getCardVector(card));
+        if(communityCards.isEmpty()){
+            for (int i = 0; i < 5; i++) {
+                states.add((double)0);
+            }
+        }else {
+            for (int i = 0; i < 5; i++) {
+                if(i+1<=communityCards.size()){
+                    states.add(getCardVector(communityCards.get(i)));
+                }else {
+                    states.add((double)0);
+                }
+            }
         }
-        states.add((double) (player.getRank()/PlayerSize));
-        states.add((double) (player.getShape().getValue()/9));
+        //states.add((double) (player.getRank()/playerSize));
+        if(player.getShape()!=null){
+            states.add((double) player.getShape().getValue()/9);
+        }else {
+            states.add((double) 0);
+        }
+
 
         return states.stream().mapToDouble(Double::doubleValue).toArray();
     }

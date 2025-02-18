@@ -1,11 +1,27 @@
 package main;
 
+import AiModel.State;
+import AiModel.Step;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class AiPlayer extends Player{
-    public AiPlayer(String name,int chips) {
+
+    private List<Step> steps;
+
+    public List<Step> getSteps() {
+        return steps;
+    }
+
+    public void setSteps(List<Step> steps) {
+        this.steps = steps;
+    }
+
+    public AiPlayer(String name, int chips) {
         super(name,chips);
+        this.steps=new ArrayList<>();
     }
 
     @Override

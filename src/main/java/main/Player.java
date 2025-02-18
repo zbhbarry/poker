@@ -5,7 +5,6 @@ import java.util.List;
 
 public abstract class Player {
 
-
     public enum Action
     {
 
@@ -212,7 +211,7 @@ public abstract class Player {
        this.isAllIn=0;
        this.CurrentBet=0;
        this.chips=chips;
-       this.isWin=0;
+       this.isWin=-1;
        this.PredictiveChips=0;
        this.OriginChips=0;
        this.Hands=new ArrayList<>(2);
@@ -231,7 +230,7 @@ public abstract class Player {
         setIsFold(0);
         setIsAllIn(0);
         setCurrentBet(0);
-        setIsWin(0);
+        setIsWin(-1);
         setTotalBet(0);
         setSpaceBet(0);
         if(chips<=0) {

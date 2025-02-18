@@ -1,5 +1,8 @@
 package main;
 
+import AiModel.State;
+import AiModel.Step;
+
 import java.util.*;
 
 public class Desk {
@@ -15,6 +18,30 @@ public class Desk {
     private int GameRound;
 
     private Set<Player> LivePlayer;
+
+    private State state;
+
+    private int TotalPot;
+
+    public int getTotalPot() {
+        return TotalPot;
+    }
+
+    public void setTotalPot() {
+        int sum=0;
+        for (Player player : players) {
+            sum+=player.getChips();
+        }
+        TotalPot = sum;
+    }
+
+    public State getState() {
+        return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
 
     public Poker getPoker() {
         return poker;
@@ -54,6 +81,9 @@ public class Desk {
         this.bet=new Bet(players.size());
         this.players=players;
         this.LivePlayer=new HashSet<>(players);
+        this.GameRound=0;
+        this.state=new State();
+        this.TotalPot=0;
     }
 
     //表示一轮游戏
@@ -70,6 +100,8 @@ public class Desk {
             }
             bet.initBet();
             LivePlayer=new HashSet<>(players);
+            GameRound=0;
+            setTotalPot();
         }
 
         //分位置
@@ -79,38 +111,39 @@ public class Desk {
 
         //手牌轮
         DealHands();
-        //setPlayerShape();
+        setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
         //翻牌轮
         DealFlop();
-        //setPlayerShape();
+        setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
         //转牌轮
         DealTurn();
-        //setPlayerShape();
+        setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
         //河牌轮
         DealRiver();
-        //setPlayerShape();
+        setPlayerShape();
         BetRound();
         //getPlayerInfo();
 
 
         setPlayerShape();
-        getPlayerInfo();
 
 
         JudeWinner();
 
+        setReward();
 
+
+        getPlayerInfo();
         getLiverPlayerInfo();
-
 
     }
 
@@ -130,8 +163,8 @@ public class Desk {
     public void getLiverPlayerInfo()
     {
         //测试判断是否准确;
-        System.out.println("存活的玩家: ");
-        for (Player player : LivePlayer) {
+        System.out.println("所有的玩家: ");
+        for (Player player : players) {
             //System.out.print(player.getName()+",");
             System.out.print(player.getName()+"的起始筹码量是"+player.getOriginChips()+",");
             System.out.println(player.getName()+"的当前筹码数量是"+player.getChips());
@@ -143,18 +176,24 @@ public class Desk {
     public void getPlayerInfo()
     {
         // System.out.println("第" + GameRound + "回合");
+        System.out.println("  ");
+        System.out.println("底池数量是 :"+bet.getPot());
         System.out.println("公共牌是"+shapeJude.getCommunityCard());
         setPlayerShape();
         for (Player player : players) {
 
             String name=player.getName();
 
-            System.out.print(name+"的手牌是"+player.getHands()+",");
-            System.out.print(name+"的最大组成牌是"+player.getMaxShapeCards()+",");
-            System.out.print(name+"的最大牌型是"+player.getShape()+",");
-            System.out.print(name+"的总下注量"+player.getTotalBet()+",");
-            System.out.print(name+"的弃牌状态"+player.getIsFold()+",");
-            System.out.println("剩余筹码数量是"+player.getChips());
+            System.out.print(name+"的手牌是"+player.getHands()+"  ");
+            System.out.print(name+"的最大组成牌是"+player.getMaxShapeCards()+"  ");
+            System.out.print(name+"的最大牌型是"+player.getShape()+"  ");
+            System.out.print(name+"的总下注量"+player.getTotalBet()+"  ");
+            System.out.print(name+"的弃牌状态"+player.getIsFold()+"  ");
+            System.out.print(name+"的加注次数是"+player.getRaiseNum()+"  ");
+            System.out.print(name+"的全压状态"+player.getIsAllIn()+"  ");
+            System.out.print(name+"的胜利情况"+player.getIsWin()+"  ");
+            System.out.print(name+"的历史筹码量是"+player.getOriginChips()+"  ");
+            System.out.println("当前筹码数量是"+player.getChips());
 
         }
     }
@@ -224,6 +263,9 @@ public class Desk {
                     if (!(player.getIsAllIn() == 1 || player.getIsFold() == 1)) {
                         Player.Action action = player.SelectAction(null, bet.GetValidActions(player));
                         bet.DoAction(action, player);
+                        if(player instanceof AiPlayer) {
+                            addStep((AiPlayer) player,action);
+                        }
                         if (action == Player.Action.FOLD) {
                             LivePlayer.remove(player);
                         }
@@ -233,7 +275,7 @@ public class Desk {
         }
 
         for (Player player : players) {
-            player.setTotalBet(player.getTotalBet()+player.getCurrentBet());
+           // player.setTotalBet(player.getTotalBet()+player.getCurrentBet());
             player.setSpaceBet(player.getTotalBet());
             player.setCurrentBet(0);
         }
@@ -363,10 +405,12 @@ public class Desk {
         for (Player player : winners) {
             int history=player.getOriginChips();
             int now=player.getChips();
-            if(history<=now) {
+            if(history<now) {
                 player.setIsWin(1);
-            }else {
+            } else if (history==now) {
                 player.setIsWin(0);
+            } else {
+                player.setIsWin(-1);
             }
         }
     }
@@ -439,7 +483,47 @@ public class Desk {
 
     }
 
+    //添加步骤
+    private void addStep(AiPlayer aiplayer, Player.Action action)
+    {
+        int RaiseNum=0;
+        for (Player player1 : players) {
+            RaiseNum+=player1.getRaiseNum();
+        }
+        double[] temp=state.getState(
+                aiplayer,
+                GameRound,
+                players.size(),
+                LivePlayer.size(),
+                TotalPot,
+                bet.getPot(),
+                RaiseNum,
+                shapeJude.getCommunityCard(),
+                players
+        );
 
+        if(!aiplayer.getSteps().isEmpty()){
+            aiplayer.getSteps().get(aiplayer.getSteps().size()-1).setNextStates(temp);
+        }
+        aiplayer.getSteps().add(new Step(temp,action,null));
+    }
+
+
+    private void setReward() {
+
+        for (Player player : players) {
+            AiPlayer aiPlayer=(AiPlayer) player;
+            for (Step step : aiPlayer.getSteps()) {
+                if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==1){
+                    step.setReward(-1);
+                }else if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==-1){
+                    step.setReward(1);
+                } else if (aiPlayer.getIsFold()!=1) {
+                    step.setReward(aiPlayer.getIsWin());
+                }
+            }
+        }
+    }
 
 
 }
