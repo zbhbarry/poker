@@ -5,6 +5,8 @@ import AiModel.Step;
 
 import java.util.*;
 
+import static AiModel.State.roundToThreeDecimalPlaces;
+
 public class Desk {
 
     private Poker poker;
@@ -133,14 +135,11 @@ public class Desk {
         BetRound();
         //getPlayerInfo();
 
-
         setPlayerShape();
-
 
         JudeWinner();
 
         setReward();
-
 
         getPlayerInfo();
         getLiverPlayerInfo();
@@ -477,8 +476,6 @@ public class Desk {
 
             }
 
-
-
         }while (bet.getPot()!=0);
 
     }
@@ -490,6 +487,7 @@ public class Desk {
         for (Player player1 : players) {
             RaiseNum+=player1.getRaiseNum();
         }
+
         double[] temp=state.getState(
                 aiplayer,
                 GameRound,
@@ -504,8 +502,9 @@ public class Desk {
 
         if(!aiplayer.getSteps().isEmpty()){
             aiplayer.getSteps().get(aiplayer.getSteps().size()-1).setNextStates(temp);
+        }else {
+            aiplayer.getSteps().add(new Step(temp, action, null));
         }
-        aiplayer.getSteps().add(new Step(temp,action,null));
     }
 
 
@@ -514,15 +513,22 @@ public class Desk {
         for (Player player : players) {
             AiPlayer aiPlayer=(AiPlayer) player;
             for (Step step : aiPlayer.getSteps()) {
+                double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips());
                 if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==1){
-                    step.setReward(-1);
+                    step.setReward(reward);
                 }else if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==-1){
-                    step.setReward(1);
+                    step.setReward(1+reward);
                 } else if (aiPlayer.getIsFold()!=1) {
-                    step.setReward(aiPlayer.getIsWin());
+                    step.setReward(reward);
                 }
             }
         }
+
+        for (Player player : players) {
+            AiPlayer aiPlayer=(AiPlayer) player;
+            System.out.println(aiPlayer.getSteps().get(0).getReward());
+        }
+
     }
 
 

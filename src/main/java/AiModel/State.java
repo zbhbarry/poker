@@ -3,22 +3,14 @@ package AiModel;
 import main.Card;
 import main.Player;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
 public class State {
 
 
-    public double[] getState(Player player,
-                             int round,
-                             int playerSize,
-                             int liver,
-                             int TotalPot,
-                             int pot,
-                             int TotalRaise,
-                             List<Card> communityCards,
-                             List<Player> players) {
-        List<Double> states=new ArrayList<>();
         /*
         - 回合数
         - 玩家人数
@@ -35,67 +27,84 @@ public class State {
         - 手牌与牌桌实力的组合
         //- 手牌与牌桌潜力的组合
         */
-        states.add((double) (round/4));
-        states.add((double) playerSize);
-        states.add((double) liver);
-        states.add((double) player.getPosition());
-        states.add((double)pot/TotalPot);//玩家总筹码量的百分比
-        states.add((double)player.getTotalBet()/pot);//玩家下注量和底池的比较
+    public double[] getState(Player player,
+                             int round,
+                             int playerSize,
+                             int liver,
+                             int TotalPot,
+                             int pot,
+                             int TotalRaise,
+                             List<Card> communityCards,
+                             List<Player> players) {
+        List<Double> states = new ArrayList<>();
 
-        if(TotalRaise==0) {
-            states.add((double) 0);//玩家的加注次数和所有玩家总加注次数比较
-        }else {
-            states.add((double) player.getRaiseNum()/TotalRaise);//玩家的加注次数和所有玩家总加注次数比较
+        states.add(roundToThreeDecimalPlaces((double) round / 4));
+        states.add(roundToThreeDecimalPlaces((double) playerSize));
+        states.add(roundToThreeDecimalPlaces((double) liver));
+        states.add(roundToThreeDecimalPlaces((double) player.getPosition()));
+        states.add(roundToThreeDecimalPlaces((double) pot / TotalPot));
+        states.add(roundToThreeDecimalPlaces((double) player.getTotalBet() / pot));
+
+        if (TotalRaise == 0) {
+            states.add(0.000);
+        } else {
+            states.add(roundToThreeDecimalPlaces((double) player.getRaiseNum() / TotalRaise));
         }
-
 
         for (Player other : players) {
             if (other != player) {
-                states.add( (double)other.getTotalBet() / pot);
+                states.add(roundToThreeDecimalPlaces((double) other.getTotalBet() / pot));
             }
         }
 
-        if(TotalRaise==0) {
+        if (TotalRaise == 0) {
             for (Player other : players) {
-                if(other!=player) {
-                    states.add((double) 0);
+                if (other != player) {
+                    states.add(0.000);
                 }
             }
-        }else {
+        } else {
             for (Player other : players) {
-                if(other!=player) {
-                    states.add((double) other.getRaiseNum()/TotalRaise);
-                }
-            }//玩家的加注次数和所有玩家总加注次数比较
-        }
-
-        states.add(getCardVector(player.getHands().get(0)));
-        states.add(getCardVector(player.getHands().get(1)));
-        if(communityCards.isEmpty()){
-            for (int i = 0; i < 5; i++) {
-                states.add((double)0);
-            }
-        }else {
-            for (int i = 0; i < 5; i++) {
-                if(i+1<=communityCards.size()){
-                    states.add(getCardVector(communityCards.get(i)));
-                }else {
-                    states.add((double)0);
+                if (other != player) {
+                    states.add(roundToThreeDecimalPlaces((double) other.getRaiseNum() / TotalRaise));
                 }
             }
         }
-        //states.add((double) (player.getRank()/playerSize));
-        if(player.getShape()!=null){
-            states.add((double) player.getShape().getValue()/9);
-        }else {
-            states.add((double) 0);
+
+        states.add(roundToThreeDecimalPlaces(getCardVector(player.getHands().get(0))));
+        states.add(roundToThreeDecimalPlaces(getCardVector(player.getHands().get(1))));
+
+        if (communityCards.isEmpty()) {
+            for (int i = 0; i < 5; i++) {
+                states.add(0.000);
+            }
+        } else {
+            for (int i = 0; i < 5; i++) {
+                if (i + 1 <= communityCards.size()) {
+                    states.add(roundToThreeDecimalPlaces(getCardVector(communityCards.get(i))));
+                } else {
+                    states.add(0.000);
+                }
+            }
         }
 
+        if (player.getShape() != null) {
+            states.add(roundToThreeDecimalPlaces((double) player.getShape().getValue() / 9));
+        } else {
+            states.add(0.000);
+        }
 
         return states.stream().mapToDouble(Double::doubleValue).toArray();
     }
 
 
+    //设置精度
+    public static double roundToThreeDecimalPlaces(double value) {
+        return new BigDecimal(value).setScale(3, RoundingMode.HALF_UP).doubleValue();
+    }
+
+
+    //设置每个牌的编号，归一化
     public double getCardVector(Card card)
     {
         //CardValue=(Suit−1)×13+Rank

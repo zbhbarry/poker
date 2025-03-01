@@ -7,7 +7,7 @@ public class Step {
     private double[] nextStates;
     private double[] states;
     private int action;
-    private int reward;
+    private double reward;
 
     public double[] getStates() {
         return states;
@@ -34,18 +34,18 @@ public class Step {
         this.action = action;
     }
 
-    public int getReward() {
+    public double getReward() {
         return reward;
     }
 
-    public void setReward(int reward) {
+    public void setReward(double reward) {
         this.reward = reward;
     }
 
     public Step(double[] states, Player.Action action,double[] nextStates) {
         this.states = states;
         this.action = action.getValue();
-        this.reward = 0;
+        this.reward = 1.0;
         this.nextStates=nextStates;
     }
 }
