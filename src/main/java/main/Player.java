@@ -233,9 +233,6 @@ public abstract class Player {
         setIsWin(-1);
         setTotalBet(0);
         setSpaceBet(0);
-        if(chips<=0) {
-            setChips(3000);
-        }
         setOriginChips(chips);
         setPredictiveChips(0);
         setRaiseNum(0);

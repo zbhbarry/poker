@@ -92,8 +92,10 @@ public class Desk {
     public void round()
     {
 
+
         //数据初始化\
         {
+            setChips();
             poker = new Poker();
             shapeJude.getCommunityCard().clear();
             shapeJude.getAllCard().clear();
@@ -144,6 +146,21 @@ public class Desk {
         getPlayerInfo();
         getLiverPlayerInfo();
 
+    }
+
+    //初始化玩家筹码
+    public void setChips() {
+        int max=0;
+        for (Player player : players) {
+            if(player.getChips()>max){
+                max=player.getChips();
+            }
+        }
+        for (Player player : players) {
+            if(player.getChips()<max/2){
+                player.setChips(max/2);
+            }
+        }
     }
 
     public void setPlayerShape() {
@@ -250,7 +267,6 @@ public class Desk {
 
         for (Player player : players) {
             if(!(player.getIsAllIn()==1||player.getIsFold()==1)) count++;
-
         }
 
         if(count!=1) {
@@ -502,9 +518,9 @@ public class Desk {
 
         if(!aiplayer.getSteps().isEmpty()){
             aiplayer.getSteps().get(aiplayer.getSteps().size()-1).setNextStates(temp);
-        }else {
-            aiplayer.getSteps().add(new Step(temp, action, null));
         }
+        aiplayer.getSteps().add(new Step(temp, action, null));
+
     }
 
 
@@ -512,8 +528,8 @@ public class Desk {
 
         for (Player player : players) {
             AiPlayer aiPlayer=(AiPlayer) player;
+            double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips()-1);
             for (Step step : aiPlayer.getSteps()) {
-                double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips());
                 if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==1){
                     step.setReward(reward);
                 }else if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==-1){

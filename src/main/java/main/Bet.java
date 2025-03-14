@@ -244,6 +244,7 @@ public class Bet {
                     player.setRaiseNum(player.getRaiseNum()+1);
                 }
             }
+
             default -> System.out.println("未知动作");
         }
         if(player.getChips()==0){
@@ -252,8 +253,6 @@ public class Bet {
 
 
         setPot(pot+betNum);
-
-
 
 
     }
