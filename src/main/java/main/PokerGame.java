@@ -1,11 +1,10 @@
 package main;
 
 
-import AiModel.Step;
+import AiModel.AiPlayer;
+import AiModel.Experience;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class PokerGame {
@@ -22,7 +21,7 @@ public class PokerGame {
 
         Player player1=new AiPlayer("AI_1",CHIPS);
         Player player2=new AiPlayer("AI_2",CHIPS);
-       // Player player3=new AiPlayer("AI_3",CHIPS);
+        Player player3=new AiPlayer("AI_3",CHIPS);
        // Player player4=new AiPlayer("AI_4",CHIPS);
        // Player player5=new AiPlayer("AI_5",CHIPS);
       //  Player player6=new AiPlayer("AI_6",CHIPS);
@@ -32,7 +31,7 @@ public class PokerGame {
       //  players.add(player6);
         players.add(player1);
         players.add(player2);
-      //  players.add(player3);
+        players.add(player3);
       //  players.add(player4);
        // players.add(player5);
 
@@ -49,8 +48,8 @@ public class PokerGame {
             i++;
             for (Player player : desk.getPlayers()) {
                 AiPlayer aiPlayer=(AiPlayer) player;
-                for (Step step : aiPlayer.getSteps()) {
-                    for (double state : step.getStates()) {
+                for (Experience experience : aiPlayer.getSteps()) {
+                    for (double state : experience.getStates()) {
                         System.out.print(state);
                         System.out.print("      ");
                     }

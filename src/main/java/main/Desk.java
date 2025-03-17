@@ -1,11 +1,10 @@
 package main;
 
+import AiModel.AiPlayer;
 import AiModel.State;
-import AiModel.Step;
+import AiModel.Experience;
 
 import java.util.*;
-
-import static AiModel.State.roundToThreeDecimalPlaces;
 
 public class Desk {
 
@@ -279,7 +278,7 @@ public class Desk {
                         Player.Action action = player.SelectAction(null, bet.GetValidActions(player));
                         bet.DoAction(action, player);
                         if(player instanceof AiPlayer) {
-                            addStep((AiPlayer) player,action);
+                            addExperience((AiPlayer) player,action, (Set<Player.Action>) bet.GetValidActions(player));
                         }
                         if (action == Player.Action.FOLD) {
                             LivePlayer.remove(player);
@@ -497,7 +496,7 @@ public class Desk {
     }
 
     //添加步骤
-    private void addStep(AiPlayer aiplayer, Player.Action action)
+    private void addExperience(AiPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
     {
         int RaiseNum=0;
         for (Player player1 : players) {
@@ -519,13 +518,15 @@ public class Desk {
         if(!aiplayer.getSteps().isEmpty()){
             aiplayer.getSteps().get(aiplayer.getSteps().size()-1).setNextStates(temp);
         }
-        aiplayer.getSteps().add(new Step(temp, action, null));
+        aiplayer.getSteps().add(new Experience(temp, action, null,validActions));
+
 
     }
 
 
     private void setReward() {
 
+        /*
         for (Player player : players) {
             AiPlayer aiPlayer=(AiPlayer) player;
             double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips()-1);
@@ -538,11 +539,24 @@ public class Desk {
                     step.setReward(reward);
                 }
             }
+
+        }
+        */
+        for (Player player : LivePlayer) {
+            AiPlayer aiPlayer=(AiPlayer) player;
+            double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips()-1);
+            for (Experience experience : aiPlayer.getSteps()) {
+                if(experience.getNextStates()!=null){
+                    experience.setReward(0);
+                }else{
+                    experience.setReward(reward);
+                }
+            }
         }
 
         for (Player player : players) {
             AiPlayer aiPlayer=(AiPlayer) player;
-            System.out.println(aiPlayer.getSteps().get(0).getReward());
+            System.out.println(aiPlayer.getSteps().get(aiPlayer.getSteps().size()-1).getReward());
         }
 
     }
