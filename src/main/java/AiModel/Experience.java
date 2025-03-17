@@ -10,7 +10,7 @@ public class Experience {
     private double[] states;
     private int action;
     private double reward;
-    private Set<Integer> validActions;
+    private Set<Player.Action> validActions;
 
     public double[] getStates() {
         return states;
@@ -43,11 +43,20 @@ public class Experience {
     public void setReward(double reward) {
         this.reward = reward;
     }
-    
+
+    public Set<Player.Action> getValidActions() {
+        return validActions;
+    }
+
+    public void setValidActions(Set<Player.Action> validActions) {
+        this.validActions = validActions;
+    }
+
     public Experience(double[] states, Player.Action action, double[] nextStates, Set<Player.Action> validActions) {
         this.states = states;
         this.action = action.getValue();
         this.reward = 1.0;
         this.nextStates=nextStates;
+        this.validActions=validActions;
     }
 }

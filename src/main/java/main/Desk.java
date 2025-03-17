@@ -278,7 +278,10 @@ public class Desk {
                         Player.Action action = player.SelectAction(null, bet.GetValidActions(player));
                         bet.DoAction(action, player);
                         if(player instanceof AiPlayer) {
-                            addExperience((AiPlayer) player,action, (Set<Player.Action>) bet.GetValidActions(player));
+                            if (bet.GetValidActions(player) != null) {
+                                Set<Player.Action> actions=new HashSet<>(bet.GetValidActions(player));
+                                addExperience((AiPlayer) player, action, actions);
+                            }
                         }
                         if (action == Player.Action.FOLD) {
                             LivePlayer.remove(player);
