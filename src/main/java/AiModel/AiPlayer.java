@@ -1,6 +1,8 @@
 package AiModel;
 
 import main.Player;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +12,9 @@ public class AiPlayer extends Player {
 
     private List<Experience> experiences;
 
-    public List<Experience> getSteps() {
+    private DQN dqn;
+
+    public List<Experience> getExperiences() {
         return experiences;
     }
 
@@ -18,22 +22,48 @@ public class AiPlayer extends Player {
         this.experiences = experiences;
     }
 
-    public AiPlayer(String name, int chips) {
+    public DQN getDqn() {
+        return dqn;
+    }
+
+    public void setDqn(DQN dqn) {
+        this.dqn = dqn;
+    }
+
+    public AiPlayer(String name, int chips, DQN dqn) {
         super(name,chips);
         this.experiences =new ArrayList<>();
+        this.dqn=dqn;
     }
 
     @Override
-    public Action SelectAction(double[] state,List<Action> validActions) {
-
-        // 创建一个随机数生成器
+    public Action SelectAction(double[] state, List<Action> validActions) {
         Random random = new Random();
 
-        // 生成一个随机的索引，范围是 0 到 validActions.size() - 1
-        int randomIndex = random.nextInt(validActions.size());
+        if (random.nextDouble() < dqn.epsilon) {
+            // 随机选择一个合法动作（探索）
+            return validActions.get(random.nextInt(validActions.size()));
+        } else {
+            // 计算 Q 值
+            INDArray State = Nd4j.create(state);
+            INDArray qValues = dqn.getqNetwork().output(State);
 
-        // 返回所选动作
-        return  validActions.get(randomIndex);
+            // 在 validActions 里找到 Q 值最大的动作
+            Action bestAction = null;
+            double maxQ = Double.NEGATIVE_INFINITY;
 
+            for (Action action : validActions) {
+                int actionIndex = action.getValue(); // 获取枚举对应的索引
+                double qValue = qValues.getDouble(actionIndex);
+
+                if (qValue > maxQ) {
+                    maxQ = qValue;
+                    bestAction = action;
+                }
+            }
+            return bestAction;
+        }
     }
+
+
 }

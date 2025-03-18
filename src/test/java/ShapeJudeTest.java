@@ -1,5 +1,6 @@
 import AiModel.AiPlayer;
 import main.Card;
+import main.HumanPlayer;
 import main.Player;
 
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class ShapeJudeTest {
 
     main.ShapeJude shapeJude =new main.ShapeJude();
     List<Card> CommunityCard =new ArrayList<>();
-    Player player=new AiPlayer("li",3000);
+    Player player=new HumanPlayer("li",3000);
 
     public static void main(String[] args) {
 

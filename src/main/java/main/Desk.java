@@ -518,12 +518,10 @@ public class Desk {
                 players
         );
 
-        if(!aiplayer.getSteps().isEmpty()){
-            aiplayer.getSteps().get(aiplayer.getSteps().size()-1).setNextStates(temp);
+        if(!aiplayer.getExperiences().isEmpty()){
+            aiplayer.getExperiences().get(aiplayer.getExperiences().size()-1).setNextStates(temp);
         }
-        aiplayer.getSteps().add(new Experience(temp, action, null,validActions));
-
-
+        aiplayer.getExperiences().add(new Experience(temp, action, null,validActions));
     }
 
 
@@ -548,7 +546,7 @@ public class Desk {
         for (Player player : LivePlayer) {
             AiPlayer aiPlayer=(AiPlayer) player;
             double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips()-1);
-            for (Experience experience : aiPlayer.getSteps()) {
+            for (Experience experience : aiPlayer.getExperiences()) {
                 if(experience.getNextStates()!=null){
                     experience.setReward(0);
                 }else{
@@ -559,7 +557,7 @@ public class Desk {
 
         for (Player player : players) {
             AiPlayer aiPlayer=(AiPlayer) player;
-            System.out.println(aiPlayer.getSteps().get(aiPlayer.getSteps().size()-1).getReward());
+            System.out.println(aiPlayer.getExperiences().get(aiPlayer.getExperiences().size()-1).getReward());
         }
 
     }
