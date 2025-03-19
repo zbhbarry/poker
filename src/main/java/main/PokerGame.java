@@ -20,8 +20,8 @@ public class PokerGame {
         List<Player> players=new ArrayList<>();
 
         int inputSize=19;
-        int outputSize=11;
-        int trainCount=200;
+        int outputSize=13;
+        int trainCount=500;
 
         DQN dqn=new DQN(inputSize,outputSize);
 
@@ -53,7 +53,7 @@ public class PokerGame {
             desk.round();
 
             //每搁500局训练一次，并且经验池的经验要大于batch的size
-            if(i % 500 == 0){
+            if(i % trainCount == 0){
                 for (Player player : players) {
                     AiPlayer aiPlayer=(AiPlayer) player;
                     for (Experience experience : aiPlayer.getExperiences()) {

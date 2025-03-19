@@ -1,4 +1,5 @@
 package AiModel;
+import main.Player;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -164,15 +165,6 @@ public class DQN {
         return model;
     }
 
-    // 选择动作（ε-贪心策略）
-    public int selectAction(INDArray state, double epsilon) {
-        if (random.nextDouble() < epsilon) {
-            return random.nextInt(outputSize); // 随机动作（探索）
-        } else {
-            INDArray qValues = qNetwork.output(state);
-            return qValues.argMax(1).getInt(0); // 选择 Q 值最大的动作（利用）
-        }
-    }
 
     // 训练 DQN
     public void train() {
@@ -212,6 +204,14 @@ public class DQN {
             } else {
                 double maxQ = targetQValues.getRow(i).maxNumber().doubleValue();
                 targetValue = rewards[i] + gamma * maxQ;
+            }
+            INDArray qRow = targetQValues.getRow(i);
+            // 遍历 Q 值，将不合法的动作设为 -∞
+            for (int j = 0; j < qRow.columns(); j++) {
+                Player.Action action = Player.Action.fromValue(j); // 获取枚举动作
+                if (!batch.get(i).getValidActions().contains(action)) {
+                    qRow.putScalar(j, Double.NEGATIVE_INFINITY); // 设为 -∞，避免选择
+                }
             }
             qValues.putScalar(i, actions[i], targetValue); // 更新 Q 值
         }
