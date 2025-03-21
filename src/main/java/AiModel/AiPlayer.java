@@ -38,6 +38,13 @@ public class AiPlayer extends Player {
 
     @Override
     public Action SelectAction(double[] state, List<Action> validActions) {
+
+        if (validActions.isEmpty()) {
+            System.out.println("Error: No valid actions available!");
+            return null; // 或者 return 一个默认动作
+        }
+
+
         Random random = new Random();
 
         if (random.nextDouble() < dqn.epsilon) {
@@ -45,7 +52,7 @@ public class AiPlayer extends Player {
             return validActions.get(random.nextInt(validActions.size()));
         } else {
             // 计算 Q 值
-            INDArray State = Nd4j.create(state);
+            INDArray State = Nd4j.create(state).reshape(1, state.length);
             INDArray qValues = dqn.getqNetwork().output(State);
 
             // 在 validActions 里找到 Q 值最大的动作

@@ -21,9 +21,17 @@ public class PokerGame {
 
         int inputSize=19;
         int outputSize=13;
-        int trainCount=500;
+        int trainCount=50;
+        int flush=500;
+        int totalCount=30000;
+
+
+
 
         DQN dqn=new DQN(inputSize,outputSize);
+
+        double epsilonMin= dqn.epsilonMin;
+        double epsilonMax= dqn.getEpsilonMax();
 
 
         Player player1=new AiPlayer("AI_1",CHIPS,dqn);
@@ -47,12 +55,12 @@ public class PokerGame {
 
         int i=1;
 
-        while (i<10) {
+        while (i<totalCount) {
 
             System.out.println("---------------第" + i + "局----------------");
             desk.round();
 
-            //每搁500局训练一次，并且经验池的经验要大于batch的size
+            //每50局训练一次，并且经验池的经验要大于batch的size
             if(i % trainCount == 0){
                 for (Player player : players) {
                     AiPlayer aiPlayer=(AiPlayer) player;
@@ -63,7 +71,9 @@ public class PokerGame {
                 }
                 if(dqn.getReplayBuffer().size() > dqn.getBatchSize()){
                     dqn.train();
-                    dqn.getReplayBuffer().clear();
+                    if(i % flush==0) {
+                        dqn.getReplayBuffer().clear();
+                    }
                 }
             }
 
@@ -82,11 +92,14 @@ public class PokerGame {
                 System.out.println(" ");
             }
             */
+            // 在每局游戏开始时更新 epsilon
+            dqn.setEpsilon(epsilonMax - ((double) i / totalCount) * (epsilonMax - epsilonMin));
+            dqn.setEpsilon(Math.max(dqn.getEpsilon(), epsilonMin)); // 确保 epsilon 不小于 epsilonMin
+            System.out.println(dqn.getEpsilon());
         }
 
-
-
-
+        String filePath = "dqn_model.zip";
+        dqn.saveModel(filePath);
 
     }
 }

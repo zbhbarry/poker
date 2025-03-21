@@ -31,8 +31,8 @@ public class State {
                              int round,
                              int playerSize,
                              int liver,
-                             int TotalPot,
-                             int pot,
+                             long TotalPot,
+                             long pot,
                              int TotalRaise,
                              List<Card> communityCards,
                              List<Player> players) {
@@ -43,7 +43,11 @@ public class State {
         states.add(roundToThreeDecimalPlaces((double) liver));
         states.add(roundToThreeDecimalPlaces((double) player.getPosition()));
         states.add(roundToThreeDecimalPlaces((double) pot / TotalPot));
-        states.add(roundToThreeDecimalPlaces((double) player.getTotalBet() / pot));
+        if(pot!=0){
+            states.add(roundToThreeDecimalPlaces((double) player.getTotalBet() / pot));
+        }else {
+            states.add(0.000);
+        }
 
         if (TotalRaise == 0) {
             states.add(0.000);
@@ -53,7 +57,11 @@ public class State {
 
         for (Player other : players) {
             if (other != player) {
-                states.add(roundToThreeDecimalPlaces((double) other.getTotalBet() / pot));
+                if(pot!=0) {
+                    states.add(roundToThreeDecimalPlaces((double) other.getTotalBet() / pot));
+                }else {
+                    states.add(0.000);
+                }
             }
         }
 

@@ -43,17 +43,17 @@ public abstract class Player {
     }
 
     //变量
-    private int chips;//剩余筹码数量
+    private long chips;//剩余筹码数量
 
-    private int OriginChips;//初始筹码数量
+    private long OriginChips;//初始筹码数量
 
-    private int PredictiveChips;//预期可以赢得的筹码数量
+    private long PredictiveChips;//预期可以赢得的筹码数量
 
-    private int CurrentBet;//当前下注量
+    private long CurrentBet;//当前下注量
 
-    private int TotalBet;//这个回合的总投入量
+    private long TotalBet;//这个回合的总投入量
 
-    private int SpaceBet;//剩余投入量
+    private long SpaceBet;//剩余投入量
 
     private int isFold;//是否弃牌
 
@@ -101,31 +101,31 @@ public abstract class Player {
         this.shape = shape;
     }
 
-    public int getChips() {
+    public long getChips() {
         return chips;
     }
 
-    public void setChips(int chips) {
+    public void setChips(long chips) {
         this.chips = chips;
     }
 
-    public int getOriginChips() {
+    public long getOriginChips() {
         return OriginChips;
     }
 
-    public void setOriginChips(int originChips) {
+    public void setOriginChips(long originChips) {
         OriginChips = originChips;
     }
 
-    public int getSpaceBet() {
+    public long getSpaceBet() {
         return SpaceBet;
     }
 
-    public void setSpaceBet(int spaceBet) {
+    public void setSpaceBet(long spaceBet) {
         SpaceBet = spaceBet;
     }
 
-    public int getPredictiveChips() {
+    public long getPredictiveChips() {
         return PredictiveChips;
     }
 
@@ -133,11 +133,11 @@ public abstract class Player {
         PredictiveChips = predictiveChips;
     }
 
-    public int getCurrentBet() {
+    public long getCurrentBet() {
         return CurrentBet;
     }
 
-    public void setCurrentBet(int currentBet) {
+    public void setCurrentBet(long currentBet) {
         CurrentBet = currentBet;
     }
 
@@ -189,11 +189,11 @@ public abstract class Player {
         this.isWin = isWin;
     }
 
-    public int getTotalBet() {
+    public long getTotalBet() {
         return TotalBet;
     }
 
-    public void setTotalBet(int totalBet) {
+    public void setTotalBet(long totalBet) {
         TotalBet = totalBet;
     }
 

@@ -22,14 +22,14 @@ public class Desk {
 
     private State state;
 
-    private int TotalPot;
+    private long TotalPot;
 
-    public int getTotalPot() {
+    public long getTotalPot() {
         return TotalPot;
     }
 
     public void setTotalPot() {
-        int sum=0;
+        long sum=0;
         for (Player player : players) {
             sum+=player.getChips();
         }
@@ -142,22 +142,31 @@ public class Desk {
 
         setReward();
 
-        getPlayerInfo();
-        getLiverPlayerInfo();
+       // getPlayerInfo();
+        //getLiverPlayerInfo();
 
     }
 
     //初始化玩家筹码
     public void setChips() {
-        int max=0;
+        long max=0;
+        long total=0;
         for (Player player : players) {
             if(player.getChips()>max){
                 max=player.getChips();
             }
+            total+=player.getChips();
         }
-        for (Player player : players) {
-            if(player.getChips()<max/2){
-                player.setChips(max/2);
+
+        if (total < 30000000) {
+            for (Player player : players) {
+                if (player.getChips() < max / 2) {
+                    player.setChips(max / 2);
+                }
+            }
+        }else {
+            for (Player player : players) {
+                player.setChips(300);
             }
         }
     }
@@ -271,22 +280,25 @@ public class Desk {
         if(count!=1) {
             do {
                 for (Player player : players) {
+
+
                     if (LivePlayer.size() == 1) {
                          break;
                     }
                     if (!(player.getIsAllIn() == 1 || player.getIsFold() == 1)) {
-                        Player.Action action = player.SelectAction(null, bet.GetValidActions(player));
-                        bet.DoAction(action, player);
-                        if(player instanceof AiPlayer) {
-                            if (bet.GetValidActions(player) != null) {
-                                Set<Player.Action> actions=new HashSet<>(bet.GetValidActions(player));
-                                addExperience((AiPlayer) player, action, actions);
+                        if (player instanceof AiPlayer aiplayer) {
+                            double[] state = getState(aiplayer);
+                            Player.Action action = (aiplayer.SelectAction(state, bet.GetValidActions(aiplayer)));
+                            Set<Player.Action> actions = new HashSet<>(bet.GetValidActions(aiplayer));
+                            bet.DoAction(action, aiplayer);
+                            addExperience(state, aiplayer, action, actions);
+                            if (action == Player.Action.FOLD) {
+                                LivePlayer.remove(aiplayer);
                             }
                         }
-                        if (action == Player.Action.FOLD) {
-                            LivePlayer.remove(player);
-                        }
                     }
+
+
                 }
             } while (isEnd());
         }
@@ -323,17 +335,20 @@ public class Desk {
 
         setIfWin_fold(Winners);
 
+        /*
         for (Player winner : Winners) {
             if(winner.getIsFold()==1 && winner.getIsWin()==1){
                 System.out.println(winner.getName()+"虽然弃牌了，但是也可以赢");
             }
         }
 
+         */
+
         Winners.removeIf(player -> player.getIsFold() == 1);
 
-
-        System.out.println("底池数量是 :"+bet.getPot());
+        //System.out.println("底池数量是 :"+bet.getPot());
         //查看存活玩家信息
+        /*
         for (Player player : Winners) {
             System.out.println(player.getName() +"    "
                     + player.getShape() +"    "
@@ -341,6 +356,8 @@ public class Desk {
                     + player.getTotalBet()
             );
         }
+
+         */
 
         distributePot(Winners);
 
@@ -365,6 +382,7 @@ public class Desk {
             }
 
         });
+        /*
         System.out.println("排序后");
         for (int i = 0; i < Winners.size(); i++) {
             Player player=Winners.get(i);
@@ -372,6 +390,8 @@ public class Desk {
             System.out.println(player.getName()+"   "+player.getShape()+"  "+player.getMaxShapeCards());
         }
         System.out.println("  ");
+
+         */
         return Winners;
     }
 
@@ -420,8 +440,8 @@ public class Desk {
     private void setIfWin_noFold(List<Player> winners)
     {
         for (Player player : winners) {
-            int history=player.getOriginChips();
-            int now=player.getChips();
+            long history=player.getOriginChips();
+            long now=player.getChips();
             if(history<now) {
                 player.setIsWin(1);
             } else if (history==now) {
@@ -465,14 +485,14 @@ public class Desk {
                 List<Player> otherClass = new ArrayList<>(players);
                 otherClass.removeAll(firstClass);
                 otherClass.removeAll(finish);
-                int sumWinner = 0;
+                long sumWinner = 0;
 
                 for (Player player : firstClass) {
                     sumWinner = player.getTotalBet() + sumWinner;
                 }
 
                 for (Player player : firstClass) {
-                    int shouldWin = player.getSpaceBet();
+                    long shouldWin = player.getSpaceBet();
                     for (Player other : otherClass) {
                         if (sumWinner <= other.getSpaceBet()) {
                             shouldWin += player.getTotalBet();
@@ -499,14 +519,23 @@ public class Desk {
     }
 
     //添加步骤
-    private void addExperience(AiPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
+    private void addExperience(double[] state,AiPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
     {
+
+        if(!aiplayer.getExperiences().isEmpty()){
+            aiplayer.getExperiences().get(aiplayer.getExperiences().size()-1).setNextStates(state);
+        }
+        aiplayer.getExperiences().add(new Experience(state, action, null,validActions));
+    }
+
+    private double[] getState(AiPlayer aiplayer){
+
         int RaiseNum=0;
-        for (Player player1 : players) {
-            RaiseNum+=player1.getRaiseNum();
+        for (Player player : players) {
+            RaiseNum+=player.getRaiseNum();
         }
 
-        double[] temp=state.getState(
+        return state.getState(
                 aiplayer,
                 GameRound,
                 players.size(),
@@ -517,11 +546,6 @@ public class Desk {
                 shapeJude.getCommunityCard(),
                 players
         );
-
-        if(!aiplayer.getExperiences().isEmpty()){
-            aiplayer.getExperiences().get(aiplayer.getExperiences().size()-1).setNextStates(temp);
-        }
-        aiplayer.getExperiences().add(new Experience(temp, action, null,validActions));
     }
 
 
@@ -543,14 +567,21 @@ public class Desk {
 
         }
         */
-        for (Player player : LivePlayer) {
+        for (Player player : players) {
             AiPlayer aiPlayer=(AiPlayer) player;
             double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips()-1);
             for (Experience experience : aiPlayer.getExperiences()) {
-                if(experience.getNextStates()!=null){
-                    experience.setReward(0);
-                }else{
-                    experience.setReward(reward);
+                if(experience.getNextStates()==null){
+                    if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==1){
+                        experience.setReward(reward);
+                    }else if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==-1){
+                        experience.setReward(1+reward);
+                    } else if (aiPlayer.getIsFold()!=1) {
+                        experience.setReward(reward);
+                    }
+                    Experience exp = aiPlayer.getExperiences().get(aiPlayer.getExperiences().size() - 1);
+                    exp.setNextStates(getState(aiPlayer));
+                    exp.setDone(true);
                 }
             }
         }

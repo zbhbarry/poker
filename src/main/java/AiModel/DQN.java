@@ -11,7 +11,9 @@ import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.learning.config.Adam;
-
+import org.deeplearning4j.util.ModelSerializer;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,10 +32,10 @@ public class DQN {
     private List<Experience> replayBuffer = new ArrayList<>();
     private Random random = new Random();
     private int stepCounter = 0;// 训练步数
-    double epsilon = 1.0;         // 初始探索率
-    double epsilonDecay = 0.99;   // 衰减率
-    double epsilonMin = 0.1;      // 最小探索率
-
+    double epsilonMax = 1.0;         // 初始探索率
+    double epsilonDecay = 0.001;   // 衰减率
+    public double epsilonMin = 0.01;      // 最小探索率
+    double epsilon = 0;
 
     public double getEpsilon() {
         return epsilon;
@@ -41,6 +43,14 @@ public class DQN {
 
     public void setEpsilon(double epsilon) {
         this.epsilon = epsilon;
+    }
+
+    public double getEpsilonMax() {
+        return epsilonMax;
+    }
+
+    public void setEpsilonMax(double epsilon) {
+        this.epsilonMax = epsilon;
     }
 
     public MultiLayerNetwork getqNetwork() {
@@ -165,6 +175,24 @@ public class DQN {
         return model;
     }
 
+    public void saveModel(String filePath) {
+        try {
+            ModelSerializer.writeModel(qNetwork, new File(filePath), true);
+            System.out.println("Model saved to: " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadModel(String filePath) {
+        try {
+            qNetwork = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
+            System.out.println("Model loaded from: " + filePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     // 训练 DQN
     public void train() {
@@ -192,36 +220,42 @@ public class DQN {
             rewards[i] = exp.getReward();
         }
 
-
         // 计算目标 Q 值（Bellman 方程）
         INDArray targetQValues = targetNetwork.output(nextStateBatch);
         INDArray qValues = qNetwork.output(stateBatch);
 
+        System.out.println("Predicted Q values before training: " + qValues);
+
         for (int i = 0; i < batchSize; i++) {
             double targetValue;
-            if (batch.get(i).getNextStates() == null) {
+            if (batch.get(i).isDone()) {
                 targetValue = rewards[i]; // 终止状态，Q(s,a) = reward
             } else {
                 double maxQ = targetQValues.getRow(i).maxNumber().doubleValue();
                 targetValue = rewards[i] + gamma * maxQ;
             }
-            INDArray qRow = targetQValues.getRow(i);
-            // 遍历 Q 值，将不合法的动作设为 -∞
+            INDArray qRow = qValues.getRow(i);
+            // 遍历 Q 值，将不合法的动作设为 -10
             for (int j = 0; j < qRow.columns(); j++) {
                 Player.Action action = Player.Action.fromValue(j); // 获取枚举动作
                 if (!batch.get(i).getValidActions().contains(action)) {
-                    qRow.putScalar(j, Double.NEGATIVE_INFINITY); // 设为 -∞，避免选择
+                    qRow.putScalar(j, -10); // 设为 -10，避免选择
                 }
             }
             qValues.putScalar(i, actions[i], targetValue); // 更新 Q 值
-        }
 
+           // System.out.println("State batch: " + stateBatch);
+           // System.out.println("Target Q Values: " + targetQValues);
+           // System.out.println("Q values: " + qValues);
+        }
+        System.out.println("Predicted Q values after training: " + qValues);
+        System.out.println("Final Loss: " + this.getqNetwork().score());
 
         // 训练 Q 网络
         qNetwork.fit(stateBatch, qValues);
 
         // 训练过程中衰减 epsilon
-        epsilon = Math.max(epsilon * epsilonDecay, epsilonMin);
+        epsilonMax = Math.max(epsilonMax * epsilonDecay, epsilonMin);
 
         // 每 targetUpdateFreq 步同步目标网络
         if (stepCounter % targetUpdateFreq == 0) {

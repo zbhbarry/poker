@@ -6,23 +6,23 @@ import java.util.List;
 public class Bet {
 
 
-    private int pot;
+    private long pot;
     private int GameRound;
-    private int MinBet;
+    private long MinBet;
     private final int PlayerSize;
     private Player CurrentPlayer;
 
     private int Flag;//表示第一回合大小盲注是否下注完成
 
-    public int getPot() {
+    public long getPot() {
         return pot;
     }
 
-    public void setPot(int pot) {
+    public void setPot(long pot) {
         this.pot = pot;
     }
 
-    public int getMinBet() {
+    public long getMinBet() {
         return MinBet;
     }
 
@@ -93,8 +93,8 @@ public class Bet {
         setCurrentPlayer(player);
         List<Player.Action> actions = new ArrayList<>();
 
-        int playerChips = player.getChips(); // 获取玩家的筹码
-        int potHalf = pot / 2;  // 底池的一半
+        long playerChips = player.getChips(); // 获取玩家的筹码
+        long potHalf = pot / 2;  // 底池的一半
 
         //(player.getPosition() == 0 || (PlayerSize > 2 && player.getPosition() == 1))
         if (GameRound == 1) {
@@ -149,9 +149,9 @@ public class Bet {
     public void DoAction(Player.Action action,Player player)
     {
 
-        int chipsNum=player.getChips();
-        int betNum=0;
-        int currentBet=player.getCurrentBet();
+        long chipsNum=player.getChips();
+        long betNum=0;
+        long currentBet=player.getCurrentBet();
 
         switch (action) {
 
@@ -171,7 +171,7 @@ public class Bet {
                 MinBet=2;
             }
             case BET_10 -> {
-                betNum=(int) (chipsNum * 0.1);
+                betNum=(long) (chipsNum * 0.1);
                 player.setTotalBet(player.getTotalBet()+betNum-player.getCurrentBet());
                 player.setCurrentBet(betNum);
                 player.setChips(chipsNum-betNum);
@@ -179,7 +179,7 @@ public class Bet {
                 player.setRaiseNum(player.getRaiseNum()+1);
             }
             case BET_25 -> {
-                betNum=(int) (chipsNum * 0.25);
+                betNum=(long) (chipsNum * 0.25);
                 player.setTotalBet(player.getTotalBet()+betNum-player.getCurrentBet());
                 player.setCurrentBet(betNum);
                 player.setChips(chipsNum-betNum);
@@ -187,7 +187,7 @@ public class Bet {
                 player.setRaiseNum(player.getRaiseNum()+1);
             }
             case BET_50 -> {
-                betNum=(int) (chipsNum * 0.5);
+                betNum=(long) (chipsNum * 0.5);
                 player.setTotalBet(player.getTotalBet()+betNum-player.getCurrentBet());
                 player.setCurrentBet(betNum);
                 player.setChips(chipsNum-betNum);

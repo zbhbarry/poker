@@ -11,6 +11,15 @@ public class Experience {
     private int action;
     private double reward;
     private Set<Player.Action> validActions;
+    boolean done;
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
 
     public double[] getStates() {
         return states;
@@ -55,7 +64,8 @@ public class Experience {
     public Experience(double[] states, Player.Action action, double[] nextStates, Set<Player.Action> validActions) {
         this.states = states;
         this.action = action.getValue();
-        this.reward = 1.0;
+        this.done=false;
+        this.reward=0.000;
         this.nextStates=nextStates;
         this.validActions=validActions;
     }
