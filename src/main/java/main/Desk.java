@@ -1,6 +1,6 @@
 package main;
 
-import AiModel.AiPlayer;
+import AiModel.DqnPlayer;
 import AiModel.State;
 import AiModel.Experience;
 
@@ -142,7 +142,7 @@ public class Desk {
 
         setReward();
 
-       // getPlayerInfo();
+        // getPlayerInfo();
         //getLiverPlayerInfo();
 
     }
@@ -286,14 +286,20 @@ public class Desk {
                          break;
                     }
                     if (!(player.getIsAllIn() == 1 || player.getIsFold() == 1)) {
-                        if (player instanceof AiPlayer aiplayer) {
+                        if (player instanceof DqnPlayer aiplayer) {
                             double[] state = getState(aiplayer);
-                            Player.Action action = (aiplayer.SelectAction(state, bet.GetValidActions(aiplayer)));
+                            Player.Action action = aiplayer.SelectAction(state, bet.GetValidActions(aiplayer));
                             Set<Player.Action> actions = new HashSet<>(bet.GetValidActions(aiplayer));
                             bet.DoAction(action, aiplayer);
                             addExperience(state, aiplayer, action, actions);
                             if (action == Player.Action.FOLD) {
-                                LivePlayer.remove(aiplayer);
+                                LivePlayer.remove(player);
+                            }
+                        }else if(player instanceof HumanPlayer humanPlayer){
+                            Player.Action action = humanPlayer.SelectAction(null,bet.GetValidActions(humanPlayer));
+                            bet.DoAction(action,humanPlayer);
+                            if (action == Player.Action.FOLD) {
+                                LivePlayer.remove(player);
                             }
                         }
                     }
@@ -519,7 +525,7 @@ public class Desk {
     }
 
     //添加步骤
-    private void addExperience(double[] state,AiPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
+    private void addExperience(double[] state, DqnPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
     {
 
         if(!aiplayer.getExperiences().isEmpty()){
@@ -528,7 +534,7 @@ public class Desk {
         aiplayer.getExperiences().add(new Experience(state, action, null,validActions));
     }
 
-    private double[] getState(AiPlayer aiplayer){
+    private double[] getState(DqnPlayer aiplayer){
 
         int RaiseNum=0;
         for (Player player : players) {
@@ -568,28 +574,46 @@ public class Desk {
         }
         */
         for (Player player : players) {
-            AiPlayer aiPlayer=(AiPlayer) player;
-            double reward=State.roundToThreeDecimalPlaces((double) aiPlayer.getChips()/aiPlayer.getOriginChips()-1);
-            for (Experience experience : aiPlayer.getExperiences()) {
-                if(experience.getNextStates()==null){
-                    if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==1){
-                        experience.setReward(reward);
-                    }else if(aiPlayer.getIsFold()==1 && aiPlayer.getIsWin()==-1){
-                        experience.setReward(1+reward);
-                    } else if (aiPlayer.getIsFold()!=1) {
-                        experience.setReward(reward);
+            if(player instanceof DqnPlayer dqnPlayer) {
+                double reward = State.roundToThreeDecimalPlaces((double) dqnPlayer.getChips() / dqnPlayer.getOriginChips() - 1);
+                for (Experience experience : dqnPlayer.getExperiences()) {
+                    if (experience.getNextStates() == null) {
+                        if (dqnPlayer.getIsFold() == 1 && dqnPlayer.getIsWin() == 1) {
+                            experience.setReward(reward);
+                        } else if (dqnPlayer.getIsFold() == 1 && dqnPlayer.getIsWin() == -1) {
+                            experience.setReward(1 + reward);
+                        } else if (dqnPlayer.getIsFold() != 1) {
+                            experience.setReward(reward);
+                        }
+                        //完善最终的状态，设置是否完成标志
+                        Experience exp = dqnPlayer.getExperiences().get(dqnPlayer.getExperiences().size() - 1);
+                        exp.setNextStates(getState(dqnPlayer));
+                        exp.setDone(true);
                     }
-                    Experience exp = aiPlayer.getExperiences().get(aiPlayer.getExperiences().size() - 1);
-                    exp.setNextStates(getState(aiPlayer));
-                    exp.setDone(true);
                 }
             }
         }
 
+
         for (Player player : players) {
-            AiPlayer aiPlayer=(AiPlayer) player;
-            System.out.println(aiPlayer.getExperiences().get(aiPlayer.getExperiences().size()-1).getReward());
+            if(player instanceof DqnPlayer dqnPlayer) {
+                if (dqnPlayer.getExperiences().get(dqnPlayer.getExperiences().size() - 1).getReward() > 0) {
+                    dqnPlayer.setWinCount(dqnPlayer.getWinCount() + 1);
+                }
+            }else {
+                double r = State.roundToThreeDecimalPlaces((double) player.getChips() / player.getOriginChips() - 1);
+                if (player.getIsFold() == 1 && player.getIsWin() == -1) {
+                    r+=1;
+                }
+
+                if(r>0){
+                    player.setWinCount(player.getWinCount()+1);
+                }
+            }
+           // System.out.println(aiPlayer.getExperiences().get(aiPlayer.getExperiences().size()-1).getReward());
         }
+
+
 
     }
 

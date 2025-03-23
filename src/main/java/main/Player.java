@@ -75,6 +75,15 @@ public abstract class Player {
 
     private int rank;//玩家排名
 
+    private int winCount;
+
+    public int getWinCount() {
+        return winCount;
+    }
+
+    public void setWinCount(int winCount) {
+        this.winCount = winCount;
+    }
 
     //java bean
     public List<Integer> getMaxShapeCards() {
@@ -220,6 +229,7 @@ public abstract class Player {
        this.SpaceBet=0;
        this.RaiseNum=0;
        this.rank=-1;
+       this.winCount=0;
     }
 
     public void InitPlayer()

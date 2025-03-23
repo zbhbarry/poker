@@ -67,6 +67,13 @@ information regarding copyright ownership.
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.knowm.xchart</groupId>
+            <artifactId>xchart</artifactId>
+            <version>3.8.0</version>
+        </dependency>
+
     </dependencies>
 
 

@@ -22,20 +22,20 @@ import java.util.Random;
 public class DQN {
     private MultiLayerNetwork qNetwork;         // 主 Q 网络
     private MultiLayerNetwork targetNetwork;    // 目标 Q 网络
-    private double gamma = 0.99;                // 折扣因子
-    private double learningRate = 0.001;        // 学习率
+    private double gamma;                // 折扣因子
+    private double learningRate;        // 学习率
     private int inputSize;                  // 状态空间维度
     private int outputSize;                 // 动作空间大小
-    private int targetUpdateFreq = 100;        // 目标网络同步间隔
-    private int batchSize = 32;                 // Mini-Batch 大小
+    private int targetUpdateFreq;        // 目标网络同步间隔
+    private int batchSize;                 // Mini-Batch 大小
     // private int replayMemorySize = 10000;       // 经验回放池大小
     private List<Experience> replayBuffer = new ArrayList<>();
     private Random random = new Random();
     private int stepCounter = 0;// 训练步数
-    double epsilonMax = 1.0;         // 初始探索率
-    double epsilonDecay = 0.001;   // 衰减率
-    public double epsilonMin = 0.01;      // 最小探索率
-    double epsilon = 0;
+    double epsilonMax;         // 初始探索率
+    double epsilonDecay;   // 衰减率
+    public double epsilonMin;      // 最小探索率
+    double epsilon;
 
     public double getEpsilon() {
         return epsilon;
@@ -141,13 +141,23 @@ public class DQN {
         this.stepCounter = stepCounter;
     }
 
-    public DQN(int inputSize, int outputSize) {
-        this.inputSize=inputSize;
-        this.outputSize=outputSize;
+    public DQN(int inputSize, int outputSize, double gamma, double learningRate, int targetUpdateFreq,
+               int batchSize, double epsilonMax, double epsilonDecay, double epsilonMin) {
+        this.inputSize = inputSize;
+        this.outputSize = outputSize;
+        this.gamma = gamma;
+        this.learningRate = learningRate;
+        this.targetUpdateFreq = targetUpdateFreq;
+        this.batchSize = batchSize;
+        this.epsilonMax = epsilonMax;
+        this.epsilonDecay = epsilonDecay;
+        this.epsilonMin = epsilonMin;
+        this.epsilon = epsilonMax; // 初始探索率
+
         // 初始化 Q 网络和目标网络
         qNetwork = buildNetwork(inputSize, outputSize);
         targetNetwork = buildNetwork(inputSize, outputSize);
-        targetNetwork.setParams(qNetwork.params());  // 设置目标网络的参数与 Q 网络相同
+        targetNetwork.setParams(qNetwork.params());  // 目标网络参数初始化
     }
 
     // 构建网络的方法
@@ -224,7 +234,7 @@ public class DQN {
         INDArray targetQValues = targetNetwork.output(nextStateBatch);
         INDArray qValues = qNetwork.output(stateBatch);
 
-        System.out.println("Predicted Q values before training: " + qValues);
+        //System.out.println("Predicted Q values before training: " + qValues);
 
         for (int i = 0; i < batchSize; i++) {
             double targetValue;
@@ -248,7 +258,7 @@ public class DQN {
            // System.out.println("Target Q Values: " + targetQValues);
            // System.out.println("Q values: " + qValues);
         }
-        System.out.println("Predicted Q values after training: " + qValues);
+        //System.out.println("Predicted Q values after training: " + qValues);
         System.out.println("Final Loss: " + this.getqNetwork().score());
 
         // 训练 Q 网络

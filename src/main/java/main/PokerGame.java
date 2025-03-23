@@ -1,7 +1,7 @@
 package main;
 
 
-import AiModel.AiPlayer;
+import AiModel.DqnPlayer;
 import AiModel.DQN;
 import AiModel.Experience;
 
@@ -15,29 +15,36 @@ public class PokerGame {
     public static void main(String[] args) {
 
 
-        final int CHIPS=300;
+
 
         List<Player> players=new ArrayList<>();
 
-        int inputSize=19;
-        int outputSize=13;
-        int trainCount=50;
-        int flush=500;
-        int totalCount=30000;
+        //参数设置
+        int totalCount = 100000;//总训练局数
+        int trainCount = 50;//训练步数
+        int flush = 500;//刷新经验池步数
+        final int CHIPS = 300;//初始筹码数量
+        int inputSize = 21;//状态空间维度
+        int outputSize = 13;//动作空间维度
+        double gamma = 0.99;                // 折扣因子
+        double learningRate = 0.001;        // 学习率
+        int targetUpdateFreq = 100;        // 目标网络同步间隔
+        int batchSize = 64;                 // Mini-Batch 大小
+        double epsilonMax = 1.0;         // 初始探索率
+        double epsilonDecay = 0.001;   // 衰减率
+        double epsilonMin = 0.01;      // 最小探索率
+
+
+        // 创建 DQN 对象时传入超参数
+        DQN dqn = new DQN(inputSize, outputSize, gamma, learningRate, targetUpdateFreq, batchSize, epsilonMax, epsilonDecay, epsilonMin);
 
 
 
 
-        DQN dqn=new DQN(inputSize,outputSize);
-
-        double epsilonMin= dqn.epsilonMin;
-        double epsilonMax= dqn.getEpsilonMax();
-
-
-        Player player1=new AiPlayer("AI_1",CHIPS,dqn);
-        Player player2=new AiPlayer("AI_2",CHIPS,dqn);
-        Player player3=new AiPlayer("AI_3",CHIPS,dqn);
-        //Player player4=new AiPlayer("AI_4",CHIPS,dqn);
+        Player player1=new DqnPlayer("AI_1",CHIPS,dqn);
+        Player player2=new HumanPlayer("AI_2",CHIPS);
+        Player player3=new HumanPlayer("AI_3",CHIPS);
+        Player player4=new HumanPlayer("AI_4",CHIPS);
        // Player player5=new AiPlayer("AI_5",CHIPS,dqn);
       //  Player player6=new AiPlayer("AI_6",CHIPS);
 
@@ -47,7 +54,7 @@ public class PokerGame {
         players.add(player1);
         players.add(player2);
         players.add(player3);
-        //players.add(player4);
+        players.add(player4);
        // players.add(player5);
 
 
@@ -63,11 +70,12 @@ public class PokerGame {
             //每50局训练一次，并且经验池的经验要大于batch的size
             if(i % trainCount == 0){
                 for (Player player : players) {
-                    AiPlayer aiPlayer=(AiPlayer) player;
-                    for (Experience experience : aiPlayer.getExperiences()) {
-                        dqn.getReplayBuffer().add(experience);
+                    if(player instanceof DqnPlayer dqnPlayer) {
+                        for (Experience experience : dqnPlayer.getExperiences()) {
+                            dqn.getReplayBuffer().add(experience);
+                        }
+                        dqnPlayer.getExperiences().clear();
                     }
-                    aiPlayer.getExperiences().clear();
                 }
                 if(dqn.getReplayBuffer().size() > dqn.getBatchSize()){
                     dqn.train();
@@ -95,11 +103,17 @@ public class PokerGame {
             // 在每局游戏开始时更新 epsilon
             dqn.setEpsilon(epsilonMax - ((double) i / totalCount) * (epsilonMax - epsilonMin));
             dqn.setEpsilon(Math.max(dqn.getEpsilon(), epsilonMin)); // 确保 epsilon 不小于 epsilonMin
-            System.out.println(dqn.getEpsilon());
+            System.out.println("探索率: "+dqn.getEpsilon());
         }
 
         String filePath = "dqn_model.zip";
         dqn.saveModel(filePath);
+
+
+
+        System.out.println("玩家1的胜率是:"+(double) player1.getWinCount() /i);
+        System.out.println("玩家2的胜率是:"+(double) player2.getWinCount() /i);
+        System.out.println("玩家3的胜率是:"+(double) player3.getWinCount() /i);
 
     }
 }

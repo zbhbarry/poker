@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class AiPlayer extends Player {
+public class DqnPlayer extends Player {
 
     private List<Experience> experiences;
 
@@ -30,7 +30,7 @@ public class AiPlayer extends Player {
         this.dqn = dqn;
     }
 
-    public AiPlayer(String name, int chips, DQN dqn) {
+    public DqnPlayer(String name, int chips, DQN dqn) {
         super(name,chips);
         this.experiences =new ArrayList<>();
         this.dqn=dqn;
