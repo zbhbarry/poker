@@ -294,12 +294,14 @@ public class Desk {
                             addExperience(state, aiplayer, action, actions);
                             if (action == Player.Action.FOLD) {
                                 LivePlayer.remove(player);
+                                player.setFoldCount(player.getFoldCount()+1);
                             }
                         }else if(player instanceof HumanPlayer humanPlayer){
                             Player.Action action = humanPlayer.SelectAction(null,bet.GetValidActions(humanPlayer));
                             bet.DoAction(action,humanPlayer);
                             if (action == Player.Action.FOLD) {
                                 LivePlayer.remove(player);
+                                player.setFoldCount(player.getFoldCount()+1);
                             }
                         }
                     }
@@ -576,21 +578,25 @@ public class Desk {
         for (Player player : players) {
             if(player instanceof DqnPlayer dqnPlayer) {
                 double reward = State.roundToThreeDecimalPlaces((double) dqnPlayer.getChips() / dqnPlayer.getOriginChips() - 1);
-                for (Experience experience : dqnPlayer.getExperiences()) {
-                    if (experience.getNextStates() == null) {
-                        if (dqnPlayer.getIsFold() == 1 && dqnPlayer.getIsWin() == 1) {
-                            experience.setReward(reward);
-                        } else if (dqnPlayer.getIsFold() == 1 && dqnPlayer.getIsWin() == -1) {
-                            experience.setReward(1 + reward);
-                        } else if (dqnPlayer.getIsFold() != 1) {
-                            experience.setReward(reward);
+                //完善最终的状态，设置是否完成标志
+                Experience exp = dqnPlayer.getExperiences().get(dqnPlayer.getExperiences().size() - 1);
+                exp.setNextStates(getState(dqnPlayer));
+                exp.setDone(true);
+                if(dqnPlayer.getIsFold() == 1){
+                    if (dqnPlayer.getIsWin() == 1) {
+                        exp.setReward(reward-0.2);
+                    } else if (dqnPlayer.getIsWin() == -1) {
+                        exp.setReward(1 + reward-0.1);
+                    }
+                } else  {
+                    exp.setReward(reward);
+                    for (Experience experience : dqnPlayer.getExperiences()) {
+                        if(!experience.equals(exp)){
+                            experience.setReward(0.2);
                         }
-                        //完善最终的状态，设置是否完成标志
-                        Experience exp = dqnPlayer.getExperiences().get(dqnPlayer.getExperiences().size() - 1);
-                        exp.setNextStates(getState(dqnPlayer));
-                        exp.setDone(true);
                     }
                 }
+
             }
         }
 

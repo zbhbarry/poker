@@ -75,7 +75,9 @@ public abstract class Player {
 
     private int rank;//玩家排名
 
-    private int winCount;
+    private int winCount;//赢的局数
+
+    private int foldCount;//弃牌数量
 
     public int getWinCount() {
         return winCount;
@@ -214,6 +216,14 @@ public abstract class Player {
         RaiseNum = raiseNum;
     }
 
+    public int getFoldCount() {
+        return foldCount;
+    }
+
+    public void setFoldCount(int foldCount) {
+        this.foldCount = foldCount;
+    }
+
     public Player(String name, int chips) {
        this.name=name;
        this.isFold=0;
@@ -230,6 +240,7 @@ public abstract class Player {
        this.RaiseNum=0;
        this.rank=-1;
        this.winCount=0;
+       this.foldCount=0;
     }
 
     public void InitPlayer()

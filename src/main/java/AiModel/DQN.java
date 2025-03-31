@@ -141,6 +141,10 @@ public class DQN {
         this.stepCounter = stepCounter;
     }
 
+    public DQN(){
+
+    }
+
     public DQN(int inputSize, int outputSize, double gamma, double learningRate, int targetUpdateFreq,
                int batchSize, double epsilonMax, double epsilonDecay, double epsilonMin) {
         this.inputSize = inputSize;

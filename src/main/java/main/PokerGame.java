@@ -20,11 +20,11 @@ public class PokerGame {
         List<Player> players=new ArrayList<>();
 
         //参数设置
-        int totalCount = 100000;//总训练局数
+        int totalCount = 200000;//总训练局数
         int trainCount = 50;//训练步数
         int flush = 500;//刷新经验池步数
         final int CHIPS = 300;//初始筹码数量
-        int inputSize = 21;//状态空间维度
+        int inputSize = 19;//状态空间维度
         int outputSize = 13;//动作空间维度
         double gamma = 0.99;                // 折扣因子
         double learningRate = 0.001;        // 学习率
@@ -39,12 +39,10 @@ public class PokerGame {
         DQN dqn = new DQN(inputSize, outputSize, gamma, learningRate, targetUpdateFreq, batchSize, epsilonMax, epsilonDecay, epsilonMin);
 
 
-
-
         Player player1=new DqnPlayer("AI_1",CHIPS,dqn);
         Player player2=new HumanPlayer("AI_2",CHIPS);
         Player player3=new HumanPlayer("AI_3",CHIPS);
-        Player player4=new HumanPlayer("AI_4",CHIPS);
+       // Player player4=new DqnPlayer("AI_4",CHIPS,dqn);
        // Player player5=new AiPlayer("AI_5",CHIPS,dqn);
       //  Player player6=new AiPlayer("AI_6",CHIPS);
 
@@ -54,7 +52,7 @@ public class PokerGame {
         players.add(player1);
         players.add(player2);
         players.add(player3);
-        players.add(player4);
+        //players.add(player4);
        // players.add(player5);
 
 
@@ -110,10 +108,10 @@ public class PokerGame {
         dqn.saveModel(filePath);
 
 
+        System.out.println("玩家1的胜率是:"+(double) player1.getWinCount() /totalCount+",玩家1的弃牌率是:"+(double) player1.getFoldCount() /totalCount);
+        System.out.println("玩家2的胜率是:"+(double) player2.getWinCount() /totalCount+",玩家2的弃牌率是:"+(double) player2.getFoldCount() /totalCount);
+        System.out.println("玩家3的胜率是:"+(double) player3.getWinCount() /totalCount+",玩家3的弃牌率是:"+(double) player3.getFoldCount() /totalCount);
 
-        System.out.println("玩家1的胜率是:"+(double) player1.getWinCount() /i);
-        System.out.println("玩家2的胜率是:"+(double) player2.getWinCount() /i);
-        System.out.println("玩家3的胜率是:"+(double) player3.getWinCount() /i);
 
     }
 }
