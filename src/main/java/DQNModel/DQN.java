@@ -1,4 +1,4 @@
-package AiModel;
+package DQNModel;
 import main.Player;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
@@ -201,6 +201,10 @@ public class DQN {
     public void loadModel(String filePath) {
         try {
             qNetwork = ModelSerializer.restoreMultiLayerNetwork(new File(filePath));
+            targetNetwork = new MultiLayerNetwork(qNetwork.getLayerWiseConfigurations());
+            targetNetwork.init();
+            // 同步 Q 网络到目标网络
+            targetNetwork.setParams(qNetwork.params());
             System.out.println("Model loaded from: " + filePath);
         } catch (IOException e) {
             e.printStackTrace();
@@ -269,7 +273,7 @@ public class DQN {
         qNetwork.fit(stateBatch, qValues);
 
         // 训练过程中衰减 epsilon
-        epsilonMax = Math.max(epsilonMax * epsilonDecay, epsilonMin);
+        epsilon = Math.max(epsilon * epsilonDecay, epsilonMin);
 
         // 每 targetUpdateFreq 步同步目标网络
         if (stepCounter % targetUpdateFreq == 0) {

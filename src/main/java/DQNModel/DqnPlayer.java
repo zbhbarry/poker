@@ -1,4 +1,4 @@
-package AiModel;
+package DQNModel;
 
 import main.Player;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -13,6 +13,16 @@ public class DqnPlayer extends Player {
     private List<Experience> experiences;
 
     private DQN dqn;
+
+    boolean isTrain;
+
+    public boolean isTrain() {
+        return isTrain;
+    }
+
+    public void setTrain(boolean train) {
+        isTrain = train;
+    }
 
     public List<Experience> getExperiences() {
         return experiences;
@@ -30,10 +40,11 @@ public class DqnPlayer extends Player {
         this.dqn = dqn;
     }
 
-    public DqnPlayer(String name, int chips, DQN dqn) {
+    public DqnPlayer(String name, int chips, DQN dqn,boolean isTrain) {
         super(name,chips);
         this.experiences =new ArrayList<>();
         this.dqn=dqn;
+        this.isTrain=isTrain;
     }
 
     @Override

@@ -1,9 +1,9 @@
 package main;
 
 
-import AiModel.DqnPlayer;
-import AiModel.DQN;
-import AiModel.Experience;
+import DQNModel.DqnPlayer;
+import DQNModel.DQN;
+import DQNModel.Experience;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,11 +37,16 @@ public class PokerGame {
 
         // 创建 DQN 对象时传入超参数
         DQN dqn = new DQN(inputSize, outputSize, gamma, learningRate, targetUpdateFreq, batchSize, epsilonMax, epsilonDecay, epsilonMin);
+        DQN dqn1= new DQN(inputSize, outputSize, gamma, learningRate, targetUpdateFreq, batchSize, epsilonMax, epsilonDecay, epsilonMin);
+        DQN dqn2= new DQN(inputSize, outputSize, gamma, learningRate, targetUpdateFreq, batchSize, epsilonMax, epsilonDecay, epsilonMin);
+        dqn1.loadModel("dqn_model1.zip");
+        dqn2.loadModel("dqn_model2.zip");
 
 
-        Player player1=new DqnPlayer("AI_1",CHIPS,dqn);
-        Player player2=new HumanPlayer("AI_2",CHIPS);
-        Player player3=new HumanPlayer("AI_3",CHIPS);
+
+        Player player1=new DqnPlayer("AI_1",CHIPS,dqn,true);
+        Player player2=new DqnPlayer("AI_2",CHIPS,dqn1,false);
+        Player player3=new DqnPlayer("AI_3",CHIPS,dqn2,false);
        // Player player4=new DqnPlayer("AI_4",CHIPS,dqn);
        // Player player5=new AiPlayer("AI_5",CHIPS,dqn);
       //  Player player6=new AiPlayer("AI_6",CHIPS);
@@ -66,22 +71,36 @@ public class PokerGame {
             desk.round();
 
             //每50局训练一次，并且经验池的经验要大于batch的size
-            if(i % trainCount == 0){
+
                 for (Player player : players) {
+
                     if(player instanceof DqnPlayer dqnPlayer) {
+                        DQN d=dqnPlayer.getDqn();
                         for (Experience experience : dqnPlayer.getExperiences()) {
-                            dqn.getReplayBuffer().add(experience);
+                            d.getReplayBuffer().add(experience);
                         }
                         dqnPlayer.getExperiences().clear();
+
+                        if(i % trainCount == 0 && dqnPlayer.isTrain()){
+                            d.train();
+                            System.out.println(dqnPlayer.getName()+"的Final Loss: " + d.getqNetwork().score());
+                        }
+                        if (i % flush == 0) {
+                            int bufferSize = d.getReplayBuffer().size();
+                            if (bufferSize > 0) {  // 避免 buffer 为空时报错
+                                int removeSize = (int) (0.2 * bufferSize);
+                                d.getReplayBuffer().subList(0, removeSize).clear(); // 只删除最旧的 20%
+                            }
+                        }
+                        // 在每局游戏开始时更新 epsilon
+                        d.setEpsilon(epsilonMax - ((double) i / totalCount) * (epsilonMax - epsilonMin));
+                        d.setEpsilon(Math.max(dqn.getEpsilon(), epsilonMin)); // 确保 epsilon 不小于 epsilonMin
+                        System.out.println(dqnPlayer.getName()+" 的探索率: "+d.getEpsilon());
                     }
+
                 }
-                if(dqn.getReplayBuffer().size() > dqn.getBatchSize()){
-                    dqn.train();
-                    if(i % flush==0) {
-                        dqn.getReplayBuffer().clear();
-                    }
-                }
-            }
+
+
 
 
             i++;
@@ -98,14 +117,17 @@ public class PokerGame {
                 System.out.println(" ");
             }
             */
-            // 在每局游戏开始时更新 epsilon
-            dqn.setEpsilon(epsilonMax - ((double) i / totalCount) * (epsilonMax - epsilonMin));
-            dqn.setEpsilon(Math.max(dqn.getEpsilon(), epsilonMin)); // 确保 epsilon 不小于 epsilonMin
-            System.out.println("探索率: "+dqn.getEpsilon());
+
         }
 
         String filePath = "dqn_model.zip";
         dqn.saveModel(filePath);
+
+        //String filePath1 ="dqn_model1.zip";
+        //dqn1.saveModel(filePath1);
+
+        //String filePath2 ="dqn_model2.zip";
+        //dqn2.saveModel(filePath2);
 
 
         System.out.println("玩家1的胜率是:"+(double) player1.getWinCount() /totalCount+",玩家1的弃牌率是:"+(double) player1.getFoldCount() /totalCount);

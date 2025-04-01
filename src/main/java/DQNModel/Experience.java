@@ -1,4 +1,4 @@
-package AiModel;
+package DQNModel;
 
 import main.Player;
 

@@ -1,8 +1,8 @@
 package main;
 
-import AiModel.DqnPlayer;
-import AiModel.State;
-import AiModel.Experience;
+import DQNModel.DqnPlayer;
+import DQNModel.State;
+import DQNModel.Experience;
 
 import java.util.*;
 
@@ -584,9 +584,9 @@ public class Desk {
                 exp.setDone(true);
                 if(dqnPlayer.getIsFold() == 1){
                     if (dqnPlayer.getIsWin() == 1) {
-                        exp.setReward(reward-0.2);
+                        exp.setReward(reward*0.8);
                     } else if (dqnPlayer.getIsWin() == -1) {
-                        exp.setReward(1 + reward-0.1);
+                        exp.setReward((1 + reward)*0.8);
                     }
                 } else  {
                     exp.setReward(reward);
