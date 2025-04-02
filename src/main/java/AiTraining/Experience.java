@@ -1,6 +1,6 @@
-package DQNModel;
+package AiTraining;
 
-import main.Player;
+import GameEnv.Player;
 
 import java.util.Set;
 

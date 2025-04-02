@@ -1,5 +1,6 @@
 package DQNModel;
-import main.Player;
+import AiTraining.Experience;
+import GameEnv.Player;
 import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
@@ -273,7 +274,7 @@ public class DQN {
         qNetwork.fit(stateBatch, qValues);
 
         // 训练过程中衰减 epsilon
-        epsilon = Math.max(epsilon * epsilonDecay, epsilonMin);
+       // epsilon = Math.max(epsilon * epsilonDecay, epsilonMin);
 
         // 每 targetUpdateFreq 步同步目标网络
         if (stepCounter % targetUpdateFreq == 0) {

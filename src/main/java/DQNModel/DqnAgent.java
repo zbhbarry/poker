@@ -1,36 +1,16 @@
 package DQNModel;
 
-import main.Player;
+import AiTraining.AiAgent;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class DqnPlayer extends Player {
+public class DqnAgent extends AiAgent {
 
-    private List<Experience> experiences;
 
     private DQN dqn;
-
-    boolean isTrain;
-
-    public boolean isTrain() {
-        return isTrain;
-    }
-
-    public void setTrain(boolean train) {
-        isTrain = train;
-    }
-
-    public List<Experience> getExperiences() {
-        return experiences;
-    }
-
-    public void setSteps(List<Experience> experiences) {
-        this.experiences = experiences;
-    }
 
     public DQN getDqn() {
         return dqn;
@@ -40,11 +20,9 @@ public class DqnPlayer extends Player {
         this.dqn = dqn;
     }
 
-    public DqnPlayer(String name, int chips, DQN dqn,boolean isTrain) {
-        super(name,chips);
-        this.experiences =new ArrayList<>();
+    public DqnAgent(String name, int chips, DQN dqn, boolean isTrain) {
+        super(name,chips,isTrain);
         this.dqn=dqn;
-        this.isTrain=isTrain;
     }
 
     @Override

@@ -1,7 +1,7 @@
-package DQNModel;
+package AiTraining;
 
-import main.Card;
-import main.Player;
+import GameEnv.Card;
+import GameEnv.Player;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

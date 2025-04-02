@@ -1,14 +1,15 @@
-package main;
+package AiTraining;
 
 
-import DQNModel.DqnPlayer;
+import DQNModel.DqnAgent;
 import DQNModel.DQN;
-import DQNModel.Experience;
+import GameEnv.Desk;
+import GameEnv.Player;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PokerGame {
+public class TrainMain {
 
 
 
@@ -20,7 +21,7 @@ public class PokerGame {
         List<Player> players=new ArrayList<>();
 
         //参数设置
-        int totalCount = 200000;//总训练局数
+        int totalCount = 500000;//总训练局数
         int trainCount = 50;//训练步数
         int flush = 500;//刷新经验池步数
         final int CHIPS = 300;//初始筹码数量
@@ -30,7 +31,7 @@ public class PokerGame {
         double learningRate = 0.001;        // 学习率
         int targetUpdateFreq = 100;        // 目标网络同步间隔
         int batchSize = 64;                 // Mini-Batch 大小
-        double epsilonMax = 1.0;         // 初始探索率
+        double epsilonMax = 0.8;         // 初始探索率
         double epsilonDecay = 0.001;   // 衰减率
         double epsilonMin = 0.01;      // 最小探索率
 
@@ -44,9 +45,9 @@ public class PokerGame {
 
 
 
-        Player player1=new DqnPlayer("AI_1",CHIPS,dqn,true);
-        Player player2=new DqnPlayer("AI_2",CHIPS,dqn1,false);
-        Player player3=new DqnPlayer("AI_3",CHIPS,dqn2,false);
+        Player player1=new DqnAgent("AI_1",CHIPS,dqn,true);
+        Player player2=new DqnAgent("AI_2",CHIPS,dqn1,false);
+        Player player3=new DqnAgent("AI_3",CHIPS,dqn2,false);
        // Player player4=new DqnPlayer("AI_4",CHIPS,dqn);
        // Player player5=new AiPlayer("AI_5",CHIPS,dqn);
       //  Player player6=new AiPlayer("AI_6",CHIPS);
@@ -74,16 +75,16 @@ public class PokerGame {
 
                 for (Player player : players) {
 
-                    if(player instanceof DqnPlayer dqnPlayer) {
-                        DQN d=dqnPlayer.getDqn();
-                        for (Experience experience : dqnPlayer.getExperiences()) {
+                    if(player instanceof DqnAgent dqnAgent) {
+                        DQN d= dqnAgent.getDqn();
+                        for (Experience experience : dqnAgent.getExperiences()) {
                             d.getReplayBuffer().add(experience);
                         }
-                        dqnPlayer.getExperiences().clear();
+                        dqnAgent.getExperiences().clear();
 
-                        if(i % trainCount == 0 && dqnPlayer.isTrain()){
+                        if(i % trainCount == 0 && dqnAgent.isTrain()){
                             d.train();
-                            System.out.println(dqnPlayer.getName()+"的Final Loss: " + d.getqNetwork().score());
+                            System.out.println(dqnAgent.getName()+"的Final Loss: " + d.getqNetwork().score());
                         }
                         if (i % flush == 0) {
                             int bufferSize = d.getReplayBuffer().size();
@@ -93,9 +94,9 @@ public class PokerGame {
                             }
                         }
                         // 在每局游戏开始时更新 epsilon
-                        d.setEpsilon(epsilonMax - ((double) i / totalCount) * (epsilonMax - epsilonMin));
-                        d.setEpsilon(Math.max(dqn.getEpsilon(), epsilonMin)); // 确保 epsilon 不小于 epsilonMin
-                        System.out.println(dqnPlayer.getName()+" 的探索率: "+d.getEpsilon());
+                       // d.setEpsilon(epsilonMax - ((double) i / totalCount) * (epsilonMax - epsilonMin));
+                       // d.setEpsilon(Math.max(dqn.getEpsilon(), epsilonMin)); // 确保 epsilon 不小于 epsilonMin
+                        System.out.println(dqnAgent.getName()+" 的探索率: "+d.getEpsilon());
                     }
 
                 }
@@ -104,6 +105,7 @@ public class PokerGame {
 
 
             i++;
+
             /*
             for (Player player : desk.getPlayers()) {
                 AiPlayer aiPlayer=(AiPlayer) player;
@@ -116,7 +118,9 @@ public class PokerGame {
                 }
                 System.out.println(" ");
             }
-            */
+
+             */
+
 
         }
 

@@ -1,9 +1,9 @@
 import DQNModel.DQN;
-import DQNModel.DqnPlayer;
-import DQNModel.State;
-import main.Desk;
-import main.HumanPlayer;
-import main.Player;
+import DQNModel.DqnAgent;
+import AiTraining.State;
+import GameEnv.Desk;
+import GameEnv.HumanPlayer;
+import GameEnv.Player;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class ModelTest {
         DQN dqn2 = new DQN();
         dqn2.loadModel("dqn_model2.zip");
 
-        Player player1 = new DqnPlayer("AI_1", CHIPS, dqn, false);
+        Player player1 = new DqnAgent("AI_1", CHIPS, dqn, false);
        // Player player2 = new DqnPlayer("AI_2", CHIPS,dqn1,false);
         //Player player3 = new DqnPlayer("AI_3", CHIPS,dqn2,false);
         Player player4=new HumanPlayer("AI_4",CHIPS);

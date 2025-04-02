@@ -1,6 +1,6 @@
-import main.Card;
-import main.HumanPlayer;
-import main.Player;
+import GameEnv.Card;
+import GameEnv.HumanPlayer;
+import GameEnv.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public class ShapeJudeTest {
 
 
-    main.ShapeJude shapeJude =new main.ShapeJude();
+    GameEnv.ShapeJude shapeJude =new GameEnv.ShapeJude();
     List<Card> CommunityCard =new ArrayList<>();
     Player player=new HumanPlayer("li",3000);
 
