@@ -1,6 +1,6 @@
 package main;
 
-import DQNModel.DqnPlayer;
+import DQNModel.DqnAgent;
 import DQNModel.State;
 import DQNModel.Experience;
 
@@ -286,11 +286,16 @@ public class Desk {
                          break;
                     }
                     if (!(player.getIsAllIn() == 1 || player.getIsFold() == 1)) {
-                        if (player instanceof DqnPlayer aiplayer) {
+                        if (player instanceof AiPlayer aiplayer) {
                             double[] state = getState(aiplayer);
-                            Player.Action action = aiplayer.SelectAction(state, bet.GetValidActions(aiplayer));
+                            Player.Action action = null;
+                            if(aiplayer instanceof DqnAgent dqnAgent) {
+                                action = dqnAgent.SelectAction(state, bet.GetValidActions(aiplayer));
+                            }
                             Set<Player.Action> actions = new HashSet<>(bet.GetValidActions(aiplayer));
-                            bet.DoAction(action, aiplayer);
+                            if (action != null) {
+                                bet.DoAction(action, aiplayer);
+                            }
                             addExperience(state, aiplayer, action, actions);
                             if (action == Player.Action.FOLD) {
                                 LivePlayer.remove(player);
@@ -527,7 +532,7 @@ public class Desk {
     }
 
     //添加步骤
-    private void addExperience(double[] state, DqnPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
+    private void addExperience(double[] state, AiPlayer aiplayer, Player.Action action, Set<Player.Action> validActions)
     {
 
         if(!aiplayer.getExperiences().isEmpty()){
@@ -536,7 +541,7 @@ public class Desk {
         aiplayer.getExperiences().add(new Experience(state, action, null,validActions));
     }
 
-    private double[] getState(DqnPlayer aiplayer){
+    private double[] getState(AiPlayer aiplayer){
 
         int RaiseNum=0;
         for (Player player : players) {
@@ -576,21 +581,21 @@ public class Desk {
         }
         */
         for (Player player : players) {
-            if(player instanceof DqnPlayer dqnPlayer) {
-                double reward = State.roundToThreeDecimalPlaces((double) dqnPlayer.getChips() / dqnPlayer.getOriginChips() - 1);
+            if(player instanceof AiPlayer aiPlayer) {
+                double reward = State.roundToThreeDecimalPlaces((double) aiPlayer.getChips() / aiPlayer.getOriginChips() - 1);
                 //完善最终的状态，设置是否完成标志
-                Experience exp = dqnPlayer.getExperiences().get(dqnPlayer.getExperiences().size() - 1);
-                exp.setNextStates(getState(dqnPlayer));
+                Experience exp = aiPlayer.getExperiences().get(aiPlayer.getExperiences().size() - 1);
+                exp.setNextStates(getState(aiPlayer));
                 exp.setDone(true);
-                if(dqnPlayer.getIsFold() == 1){
-                    if (dqnPlayer.getIsWin() == 1) {
+                if(aiPlayer.getIsFold() == 1){
+                    if (aiPlayer.getIsWin() == 1) {
                         exp.setReward(reward*0.8);
-                    } else if (dqnPlayer.getIsWin() == -1) {
+                    } else if (aiPlayer.getIsWin() == -1) {
                         exp.setReward((1 + reward)*0.8);
                     }
                 } else  {
                     exp.setReward(reward);
-                    for (Experience experience : dqnPlayer.getExperiences()) {
+                    for (Experience experience : aiPlayer.getExperiences()) {
                         if(!experience.equals(exp)){
                             experience.setReward(0.2);
                         }
@@ -602,9 +607,9 @@ public class Desk {
 
 
         for (Player player : players) {
-            if(player instanceof DqnPlayer dqnPlayer) {
-                if (dqnPlayer.getExperiences().get(dqnPlayer.getExperiences().size() - 1).getReward() > 0) {
-                    dqnPlayer.setWinCount(dqnPlayer.getWinCount() + 1);
+            if(player instanceof AiPlayer aiPlayer) {
+                if (aiPlayer.getExperiences().get(aiPlayer.getExperiences().size() - 1).getReward() > 0) {
+                    aiPlayer.setWinCount(aiPlayer.getWinCount() + 1);
                 }
             }else {
                 double r = State.roundToThreeDecimalPlaces((double) player.getChips() / player.getOriginChips() - 1);
