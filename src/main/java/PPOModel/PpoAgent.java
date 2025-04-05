@@ -5,8 +5,20 @@ import AiTraining.AiAgent;
 import java.util.List;
 
 public class PpoAgent extends AiAgent {
-    public PpoAgent(String name, int chips, boolean isTrain) {
+
+    PPO ppo;
+
+    public PPO getPpo() {
+        return ppo;
+    }
+
+    public void setPpo(PPO ppo) {
+        this.ppo = ppo;
+    }
+
+    public PpoAgent(String name, int chips,PPO ppo,boolean isTrain) {
         super(name, chips, isTrain);
+        this.ppo=ppo;
     }
 
     @Override

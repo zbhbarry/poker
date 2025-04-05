@@ -589,16 +589,15 @@ public class Desk {
                 exp.setNextStates(getState(aiAgent));
                 exp.setDone(true);
                 if(aiAgent.getIsFold() == 1){
-                    if (aiAgent.getIsWin() == 1) {
-                        exp.setReward(reward*0.8);
-                    } else if (aiAgent.getIsWin() == -1) {
-                        exp.setReward((1 + reward)*0.8);
-                    }
+                   if (aiAgent.getIsWin() == -1) {
+                        exp.setReward(1 + reward);
+                   }
+                   exp.setReward(reward*0.95);
                 } else  {
-                    exp.setReward(reward);
+                    exp.setReward(reward+1);
                     for (Experience experience : aiAgent.getExperiences()) {
                         if(!experience.equals(exp)){
-                            experience.setReward(0.2);
+                            experience.setReward(0.1);
                         }
                     }
                 }

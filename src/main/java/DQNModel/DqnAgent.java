@@ -23,6 +23,9 @@ public class DqnAgent extends AiAgent {
     public DqnAgent(String name, int chips, DQN dqn, boolean isTrain) {
         super(name,chips,isTrain);
         this.dqn=dqn;
+        if(!isTrain){
+            dqn.loadModel("dqn_model"+ this.getName().replaceAll("\\D+", "")+".zip");
+        }
     }
 
     @Override
@@ -36,7 +39,7 @@ public class DqnAgent extends AiAgent {
 
         Random random = new Random();
 
-        if (random.nextDouble() < dqn.epsilon) {
+        if (random.nextDouble() < dqn.epsilon && isTrain()) {
             // 随机选择一个合法动作（探索）
             return validActions.get(random.nextInt(validActions.size()));
         } else {
